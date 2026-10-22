@@ -28,45 +28,50 @@ permissions:
 
 jobs:
   generate:
+    name: Generate vertical MP4
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     steps:
-      - name: Check FFmpeg
+      - name: Install dependencies
         run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg python3-pil fonts-dejavu-core
           ffmpeg -version
           python3 --version
 
-      - name: Install Python image library
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-pil fonts-dejavu-core
-
-      - name: Create video
+      - name: Create video image
         env:
           TITLE: ${{ inputs.title }}
           SCRIPT: ${{ inputs.script }}
-          DURATION: ${{ inputs.duration }}
         run: |
+          set -e
           mkdir -p output
+
           cat > /tmp/create.py <<'PY'
           import os
           from PIL import Image, ImageDraw, ImageFont
 
           W, H = 1080, 1920
+          title = os.environ["TITLE"].strip()[:160]
+          script = os.environ["SCRIPT"].strip()[:1200]
+
           img = Image.new("RGB", (W, H), (15, 25, 55))
           draw = ImageDraw.Draw(img)
 
           bold = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
           regular = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+
           title_font = ImageFont.truetype(bold, 58)
           body_font = ImageFont.truetype(regular, 40)
+          footer_font = ImageFont.truetype(bold, 30)
 
           def wrap(text, font, limit):
               result, line = [], ""
               for word in text.split():
                   test = (line + " " + word).strip()
-                  if draw.textbbox((0, 0), test, font=font)[2] <= limit:
+                  width = draw.textbbox((0, 0), test, font=font)[2]
+                  if width <= limit:
                       line = test
                   else:
                       if line:
@@ -85,34 +90,80 @@ jobs:
           )
 
           y = 230
-          for line in wrap(os.environ["TITLE"][:160], title_font, 850)[:5]:
-              draw.text((95, y), line, font=title_font, fill=(255, 210, 80))
+          for line in wrap(title, title_font, 850)[:5]:
+              draw.text(
+                  (95, y), line,
+                  font=title_font,
+                  fill=(255, 210, 80)
+              )
               y += 85
 
           y += 55
-          for line in wrap(os.environ["SCRIPT"][:1200], body_font, 850):
+          for line in wrap(script, body_font, 850):
               if y > 1500:
                   break
-              draw.text((95, y), line, font=body_font, fill="white")
+              draw.text(
+                  (95, y), line,
+                  font=body_font,
+                  fill="white"
+              )
               y += 65
 
-          draw.text((95, 1650), "SUBSCRIBE FOR MORE",
-                    font=title_font, fill=(90, 205, 255))
+          draw.text(
+              (95, 1650),
+              "SUBSCRIBE FOR MORE",
+              font=footer_font,
+              fill=(90, 205, 255)
+          )
+
           img.save("output/short.png")
           PY
 
           python3 /tmp/create.py
+          test -s output/short.png
 
-          ffmpeg -y -loop 1 -i output/short.png \
-            -t "$DURATION" -r 30 \
+      - name: Encode MP4
+        env:
+          DURATION: ${{ inputs.duration }}
+        run: |
+          set -e
+
+          case "$DURATION" in
+            15|20|30) ;;
+            *)
+              echo "Invalid video duration: $DURATION"
+              exit 1
+              ;;
+          esac
+
+          ffmpeg -y \
+            -loop 1 \
+            -framerate 30 \
+            -i output/short.png \
+            -t "$DURATION" \
             -vf "scale=1080:1920,format=yuv420p" \
-            -c:v libx264 -preset ultrafast -crf 28 \
-            -movflags +faststart output/short.mp4
+            -c:v libx264 \
+            -preset ultrafast \
+            -crf 28 \
+            -r 30 \
+            -an \
+            -movflags +faststart \
+            output/short.mp4
+
+      - name: Verify MP4
+        run: |
+          set -e
 
           test -s output/short.mp4
-          ffprobe -v error -show_entries stream=width,height \
+
+          ffprobe -v error \
+            -select_streams v:0 \
+            -show_entries stream=codec_name,width,height \
             -show_entries format=duration \
-            -of default=noprint_wrappers=1 output/short.mp4
+            -of default=noprint_wrappers=1 \
+            output/short.mp4
+
+          ls -lh output/short.mp4
 
       - name: Upload video
         uses: actions/upload-artifact@v4
@@ -120,3 +171,4 @@ jobs:
           name: generated-text-short
           path: output/short.mp4
           retention-days: 7
+          if-no-files-found: error
