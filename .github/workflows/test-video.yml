@@ -9,33 +9,43 @@ permissions:
 jobs:
   build-test-short:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 5
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v5
 
-      - name: Install FFmpeg
+      - name: Verify FFmpeg
         run: |
-          sudo apt-get update
-          sudo apt-get install --yes ffmpeg fonts-dejavu-core
+          command -v ffmpeg
+          ffmpeg -version | head -n 1
+          command -v ffprobe
 
       - name: Create vertical test video
         run: |
           mkdir -p output
+
           ffmpeg -hide_banner -y \
-            -f lavfi -i "color=c=0x101827:s=1080x1920:r=30:d=6" \
-            -vf "drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:text='CLOUD STUDIO':fontcolor=white:fontsize=86:x=(w-text_w)/2:y=h*0.38,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:text='TEST SHORT 9:16':fontcolor=0x67E8F9:fontsize=54:x=(w-text_w)/2:y=h*0.48,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:text='Generated in GitHub Actions':fontcolor=white:fontsize=34:x=(w-text_w)/2:y=h*0.56" \
-            -c:v libx264 -preset veryfast -pix_fmt yuv420p -movflags +faststart \
+            -f lavfi \
+            -i "color=c=0x101827:s=1080x1920:r=30:d=6" \
+            -vf "drawbox=x=80:y=650:w=920:h=500:color=0x23334D:t=fill,drawbox=x=100:y=670:w=880:h=460:color=0x101827:t=fill" \
+            -c:v libx264 \
+            -preset ultrafast \
+            -threads 2 \
+            -pix_fmt yuv420p \
+            -movflags +faststart \
             output/test-short.mp4
 
       - name: Verify generated video
         run: |
           test -s output/test-short.mp4
-          ffprobe -v error -select_streams v:0 \
+
+          ffprobe -v error \
+            -select_streams v:0 \
             -show_entries stream=width,height,codec_name \
             -show_entries format=duration,size \
-            -of default=noprint_wrappers=1 output/test-short.mp4
+            -of default=noprint_wrappers=1 \
+            output/test-short.mp4
 
       - name: Upload test video
         uses: actions/upload-artifact@v6
