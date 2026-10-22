@@ -1,0 +1,37 @@
+name: Cloud Studio Health Check
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 15 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Check Python
+        run: python3 --version
+
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes ffmpeg
+
+      - name: Verify FFmpeg
+        run: ffmpeg -version
+
+      - name: Health report
+        run: |
+          echo "Cloud Studio health check"
+          date -u
+          python3 --version
+          ffmpeg -version | head -n 1
+          echo "Health check completed"
