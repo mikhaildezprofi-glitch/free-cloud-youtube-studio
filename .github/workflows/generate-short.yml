@@ -1,138 +1,122 @@
 name: Generate YouTube Short
 
-"on":
-workflow_dispatch:
-inputs:
-title:
-description: Video title
-required: true
-type: string
-default: "5 interesting facts about gold"
-script:
-description: Video text
-required: true
-type: string
-default: "Gold is a rare metal. It does not rust easily. Gold is used in electronics and medicine. Much of the gold ever mined still exists today. Subscribe for more facts!"
-duration:
-description: Video duration in seconds
-required: true
-type: choice
-options:
-- "15"
-- "20"
-- "30"
-default: "20"
+on:
+  workflow_dispatch:
+    inputs:
+      title:
+        description: "Video title"
+        required: true
+        type: string
+        default: "Gold facts"
+      script:
+        description: "Video text"
+        required: true
+        type: string
+        default: "Gold is a rare metal. Gold is used in electronics and medicine. Subscribe for more facts!"
+      duration:
+        description: "Duration in seconds"
+        required: true
+        type: choice
+        options:
+          - "15"
+          - "20"
+          - "30"
+        default: "15"
 
 permissions:
-contents: read
+  contents: read
 
 jobs:
-generate:
-runs-on: ubuntu-24.04
-timeout-minutes: 10
-steps:
-- name: Install FFmpeg and fonts
-run: |
-sudo apt-get update
-sudo apt-get install -y ffmpeg python3-pil fonts-dejavu-core
+  generate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
 
-  - name: Generate video
-    env:
-      VIDEO_TITLE: ${{ inputs.title }}
-      VIDEO_SCRIPT: ${{ inputs.script }}
-      VIDEO_DURATION: ${{ inputs.duration }}
-    run: |
-      mkdir -p output
-      cat > /tmp/create_short.py <<'PY'
-      import os
-      from PIL import Image, ImageDraw, ImageFont
+    steps:
+      - name: Check FFmpeg
+        run: |
+          ffmpeg -version
+          python3 --version
 
-      W, H = 1080, 1920
-      title = os.environ["VIDEO_TITLE"][:160]
-      script = os.environ["VIDEO_SCRIPT"][:1200]
-      duration = int(os.environ["VIDEO_DURATION"])
+      - name: Install Python image library
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pil fonts-dejavu-core
 
-      img = Image.new("RGB", (W, H), (12, 22, 45))
-      draw = ImageDraw.Draw(img)
+      - name: Create video
+        env:
+          TITLE: ${{ inputs.title }}
+          SCRIPT: ${{ inputs.script }}
+          DURATION: ${{ inputs.duration }}
+        run: |
+          mkdir -p output
+          cat > /tmp/create.py <<'PY'
+          import os
+          from PIL import Image, ImageDraw, ImageFont
 
-      for y in range(H):
-          t = y / H
-          draw.line(
-              (0, y, W, y),
-              fill=(int(12 + 18*t), int(22 + 12*t), int(45 + 35*t))
+          W, H = 1080, 1920
+          img = Image.new("RGB", (W, H), (15, 25, 55))
+          draw = ImageDraw.Draw(img)
+
+          bold = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+          regular = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+          title_font = ImageFont.truetype(bold, 58)
+          body_font = ImageFont.truetype(regular, 40)
+
+          def wrap(text, font, limit):
+              result, line = [], ""
+              for word in text.split():
+                  test = (line + " " + word).strip()
+                  if draw.textbbox((0, 0), test, font=font)[2] <= limit:
+                      line = test
+                  else:
+                      if line:
+                          result.append(line)
+                      line = word
+              if line:
+                  result.append(line)
+              return result
+
+          draw.rounded_rectangle(
+              (45, 130, 1035, 1790),
+              radius=35,
+              fill=(25, 43, 80),
+              outline=(70, 140, 220),
+              width=4
           )
 
-      bold = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
-      regular = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
-      title_font = ImageFont.truetype(bold, 65)
-      body_font = ImageFont.truetype(regular, 42)
-      footer_font = ImageFont.truetype(bold, 30)
+          y = 230
+          for line in wrap(os.environ["TITLE"][:160], title_font, 850)[:5]:
+              draw.text((95, y), line, font=title_font, fill=(255, 210, 80))
+              y += 85
 
-      def wrap(text, font, max_width):
-          lines, current = [], ""
-          for word in text.split():
-              candidate = (current + " " + word).strip()
-              if draw.textbbox((0, 0), candidate, font=font)[2] <= max_width:
-                  current = candidate
-              else:
-                  if current:
-                      lines.append(current)
-                  current = word
-          if current:
-              lines.append(current)
-          return lines
-
-      draw.rounded_rectangle(
-          (55, 150, 1025, 1770),
-          radius=40,
-          fill=(18, 34, 65),
-          outline=(60, 120, 190),
-          width=4
-      )
-
-      y = 250
-      for line in wrap(title, title_font, 850)[:5]:
-          draw.text((100, y), line, font=title_font, fill=(255, 211, 90))
-          y += 90
-
-      y += 55
-      for paragraph in script.splitlines():
-          for line in wrap(paragraph, body_font, 850):
-              if y > 1480:
+          y += 55
+          for line in wrap(os.environ["SCRIPT"][:1200], body_font, 850):
+              if y > 1500:
                   break
-              draw.text((100, y), line, font=body_font, fill=(245, 247, 255))
-              y += 62
-          y += 18
-          if y > 1480:
-              break
+              draw.text((95, y), line, font=body_font, fill="white")
+              y += 65
 
-      draw.text(
-          (100, 1640),
-          "SUBSCRIBE FOR MORE",
-          font=footer_font,
-          fill=(90, 205, 255)
-      )
-      img.save("output/short.png")
-      PY
+          draw.text((95, 1650), "SUBSCRIBE FOR MORE",
+                    font=title_font, fill=(90, 205, 255))
+          img.save("output/short.png")
+          PY
 
-      python3 /tmp/create_short.py
+          python3 /tmp/create.py
 
-      ffmpeg -y -loop 1 -i output/short.png \
-        -t "$VIDEO_DURATION" -r 30 \
-        -vf "scale=1080:1920,format=yuv420p" \
-        -c:v libx264 -preset veryfast -crf 23 \
-        -movflags +faststart output/short.mp4
+          ffmpeg -y -loop 1 -i output/short.png \
+            -t "$DURATION" -r 30 \
+            -vf "scale=1080:1920,format=yuv420p" \
+            -c:v libx264 -preset ultrafast -crf 28 \
+            -movflags +faststart output/short.mp4
 
-      test -s output/short.mp4
-      ffprobe -v error -select_streams v:0 \
-        -show_entries stream=width,height,codec_name \
-        -show_entries format=duration \
-        -of default=noprint_wrappers=1 output/short.mp4
+          test -s output/short.mp4
+          ffprobe -v error -show_entries stream=width,height \
+            -show_entries format=duration \
+            -of default=noprint_wrappers=1 output/short.mp4
 
-  - name: Upload generated video
-    uses: actions/upload-artifact@v4
-    with:
-      name: generated-text-short
-      path: output/short.mp4
-      retention-days: 7
-      if-no-files-found: error
+      - name: Upload video
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-text-short
+          path: output/short.mp4
+          retention-days: 7
