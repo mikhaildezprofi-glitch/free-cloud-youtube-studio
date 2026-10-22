@@ -3,16 +3,10 @@ name: Generate YouTube Short
 on:
   workflow_dispatch:
     inputs:
-      title:
-        description: "Заголовок видео"
-        required: true
-        default: "Мой новый Shorts"
-        type: string
-
       script:
-        description: "Текст для видео"
+        description: "Сценарий русской озвучки — на экране текста не будет"
         required: true
-        default: "Подпишись на канал, чтобы увидеть новые видео!"
+        default: "Добро пожаловать! Сегодня вас ждёт что-то интересное."
         type: string
 
       duration:
@@ -36,14 +30,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Install dependencies
         timeout-minutes: 5
         run: |
           set -e
-
-          echo "Changing Ubuntu package mirror..."
 
           if [ -f /etc/apt/sources.list.d/ubuntu.sources ]; then
             sudo sed -i \
@@ -51,15 +43,11 @@ jobs:
               /etc/apt/sources.list.d/ubuntu.sources
           fi
 
-          echo "Updating package lists..."
-
           sudo apt-get \
             -o Acquire::Retries=1 \
             -o Acquire::http::Timeout=15 \
             -o Acquire::https::Timeout=15 \
             update
-
-          echo "Installing FFmpeg, Pillow and fonts..."
 
           sudo apt-get \
             -o Acquire::Retries=1 \
@@ -68,167 +56,78 @@ jobs:
             install -y --no-install-recommends \
             ffmpeg \
             python3-pil \
-            fonts-dejavu-core
+            espeak-ng
 
-          echo "Checking installed programs..."
           ffmpeg -version
           python3 --version
+          espeak-ng --version
 
       - name: Prepare output directory
         run: |
+          set -e
           mkdir -p output
-          rm -f output/short.png output/short.mp4
+          rm -f output/short.png output/short.mp4 output/voice.wav
 
-      - name: Create video image
-        env:
-          VIDEO_TITLE: ${{ inputs.title }}
-          VIDEO_SCRIPT: ${{ inputs.script }}
+      - name: Create vertical background without text
         run: |
-          cat > create_image.py <<'PYTHON'
-          import os
-          from PIL import Image, ImageDraw, ImageFont
-          import textwrap
+          set -e
 
-          WIDTH = 1080
-          HEIGHT = 1920
+          python3 - <<'PYTHON'
+          from PIL import Image, ImageDraw
 
-          title = os.environ.get("VIDEO_TITLE", "Мой новый Shorts")
-          script = os.environ.get(
-              "VIDEO_SCRIPT",
-              "Подпишись на канал, чтобы увидеть новые видео!"
-          )
-
-          image = Image.new("RGB", (WIDTH, HEIGHT), (14, 20, 40))
+          WIDTH, HEIGHT = 1080, 1920
+          image = Image.new("RGB", (WIDTH, HEIGHT))
           draw = ImageDraw.Draw(image)
 
-          # Градиентный фон
-          top = (15, 25, 55)
-          bottom = (85, 25, 105)
+          top = (8, 15, 35)
+          bottom = (65, 20, 90)
 
           for y in range(HEIGHT):
-              ratio = y / HEIGHT
+              ratio = y / (HEIGHT - 1)
               color = tuple(
                   int(top[i] * (1 - ratio) + bottom[i] * ratio)
                   for i in range(3)
               )
               draw.line((0, y, WIDTH, y), fill=color)
 
-          # Декоративные элементы
+          # Декоративные фигуры без надписей
           draw.ellipse(
-              (760, 120, 1250, 610),
-              fill=(45, 55, 115)
+              (650, 180, 1280, 810),
+              fill=(28, 48, 105)
           )
           draw.ellipse(
-              (-180, 1350, 350, 1880),
-              fill=(50, 35, 100)
+              (-260, 1080, 480, 1820),
+              fill=(76, 24, 100)
           )
-
-          font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
-          regular_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
-
-          title_font = ImageFont.truetype(font_path, 68)
-          body_font = ImageFont.truetype(regular_path, 54)
-          small_font = ImageFont.truetype(font_path, 34)
-
-          def wrap_text(text, font, max_width):
-              words = text.split()
-              lines = []
-              current = ""
-
-              for word in words:
-                  candidate = word if not current else current + " " + word
-                  if draw.textbbox((0, 0), candidate, font=font)[2] <= max_width:
-                      current = candidate
-                  else:
-                      if current:
-                          lines.append(current)
-                      current = word
-
-              if current:
-                  lines.append(current)
-
-              return lines or [""]
-
-          def draw_centered_block(text, font, center_y, max_width, fill, spacing=24):
-              lines = wrap_text(text, font, max_width)
-              heights = [
-                  draw.textbbox((0, 0), line, font=font)[3]
-                  - draw.textbbox((0, 0), line, font=font)[1]
-                  for line in lines
-              ]
-              total_height = sum(heights) + spacing * (len(lines) - 1)
-              y = center_y - total_height / 2
-
-              for line, line_height in zip(lines, heights):
-                  bbox = draw.textbbox((0, 0), line, font=font)
-                  line_width = bbox[2] - bbox[0]
-                  x = (WIDTH - line_width) / 2
-                  draw.text((x, y), line, font=font, fill=fill)
-                  y += line_height + spacing
-
-          # Верхняя подпись
-          label = "YOUTUBE SHORTS"
-          label_bbox = draw.textbbox((0, 0), label, font=small_font)
-          label_width = label_bbox[2] - label_bbox[0]
-          draw.text(
-              ((WIDTH - label_width) / 2, 270),
-              label,
-              font=small_font,
-              fill=(255, 210, 90)
-          )
-
-          # Заголовок
-          draw_centered_block(
-              title,
-              title_font,
-              650,
-              900,
-              (255, 255, 255),
-              spacing=26
-          )
-
-          # Разделительная линия
-          draw.rounded_rectangle(
-              (340, 920, 740, 934),
-              radius=7,
-              fill=(255, 210, 90)
-          )
-
-          # Основной текст
-          draw_centered_block(
-              script,
-              body_font,
-              1190,
-              880,
-              (240, 242, 255),
-              spacing=28
-          )
-
-          # Нижняя подпись
-          footer = "ПОДПИШИСЬ НА КАНАЛ"
-          footer_bbox = draw.textbbox((0, 0), footer, font=small_font)
-          footer_width = footer_bbox[2] - footer_bbox[0]
-
-          draw.rounded_rectangle(
-              (150, 1570, 930, 1665),
-              radius=28,
-              fill=(255, 65, 95)
-          )
-
-          draw.text(
-              ((WIDTH - footer_width) / 2, 1598),
-              footer,
-              font=small_font,
-              fill=(255, 255, 255)
+          draw.ellipse(
+              (330, 650, 820, 1140),
+              fill=(25, 35, 78)
           )
 
           image.save("output/short.png")
-          print("Image created: output/short.png")
-          print(f"Title: {title}")
-          print(f"Script: {script}")
+          print("Created background without text.")
           PYTHON
 
-          python3 create_image.py
+      - name: Generate Russian voiceover
+        env:
+          VIDEO_SCRIPT: ${{ inputs.script }}
+        run: |
+          set -e
+
+          if [ -z "$VIDEO_SCRIPT" ]; then
+            echo "Voiceover script is empty."
+            exit 1
+          fi
+
+          espeak-ng \
+            -v ru \
+            -s 145 \
+            -a 160 \
+            -w output/voice.wav \
+            "$VIDEO_SCRIPT"
+
+          test -s output/voice.wav
+          echo "Russian voiceover created."
 
       - name: Render MP4 video
         env:
@@ -238,7 +137,13 @@ jobs:
 
           DURATION="${VIDEO_DURATION:-15}"
 
-          echo "Rendering ${DURATION}-second video..."
+          case "$DURATION" in
+            15|20|30) ;;
+            *)
+              echo "Unsupported duration: $DURATION"
+              exit 1
+              ;;
+          esac
 
           ffmpeg \
             -hide_banner \
@@ -247,23 +152,28 @@ jobs:
             -loop 1 \
             -framerate 30 \
             -i output/short.png \
+            -i output/voice.wav \
             -t "$DURATION" \
-            -r 30 \
             -vf "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,format=yuv420p" \
+            -af "apad" \
             -c:v libx264 \
             -preset ultrafast \
             -crf 23 \
+            -c:a aac \
+            -b:a 128k \
+            -ar 44100 \
+            -ac 2 \
             -movflags +faststart \
-            -an \
             output/short.mp4
 
           echo "Video rendered successfully."
 
-      - name: Verify generated video
+      - name: Verify generated files
         run: |
           set -e
 
           test -s output/short.png
+          test -s output/voice.wav
           test -s output/short.mp4
 
           echo "Video information:"
@@ -278,11 +188,12 @@ jobs:
           ls -lh output/
 
       - name: Upload generated video
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
-          name: generated-text-short
+          name: generated-text-free-short
           path: |
             output/short.mp4
             output/short.png
+            output/voice.wav
           retention-days: 7
           if-no-files-found: error
