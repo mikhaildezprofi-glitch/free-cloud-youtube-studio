@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       script:
-        description: "Сценарий русской озвучки — на экране текста не будет"
+        description: "Сценарий русской озвучки — без текста на экране"
         required: true
         default: "Добро пожаловать! Сегодня вас ждёт что-то интересное."
         type: string
@@ -26,14 +26,14 @@ jobs:
   generate:
     name: Create vertical video
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
 
       - name: Install dependencies
-        timeout-minutes: 5
+        timeout-minutes: 8
         run: |
           set -e
 
@@ -56,11 +56,27 @@ jobs:
             install -y --no-install-recommends \
             ffmpeg \
             python3-pil \
-            espeak-ng
+            python3-venv
+
+          python3 -m venv .venv
+          .venv/bin/python -m pip install --upgrade pip
+          .venv/bin/python -m pip install piper-tts
 
           ffmpeg -version
-          python3 --version
-          espeak-ng --version
+          .venv/bin/python -m piper --help
+
+      - name: Download neural Russian voice
+        timeout-minutes: 5
+        run: |
+          set -e
+
+          .venv/bin/python -m piper.download_voices \
+            ru_RU-irina-medium
+
+          test -s ru_RU-irina-medium.onnx
+          test -s ru_RU-irina-medium.onnx.json
+
+          echo "Piper Russian voice downloaded."
 
       - name: Prepare output directory
         run: |
@@ -90,7 +106,7 @@ jobs:
               )
               draw.line((0, y, WIDTH, y), fill=color)
 
-          # Декоративные фигуры без надписей
+          # Декоративные фигуры без текста
           draw.ellipse(
               (650, 180, 1280, 810),
               fill=(28, 48, 105)
@@ -108,7 +124,7 @@ jobs:
           print("Created background without text.")
           PYTHON
 
-      - name: Generate Russian voiceover
+      - name: Generate Russian neural voice
         env:
           VIDEO_SCRIPT: ${{ inputs.script }}
         run: |
@@ -119,15 +135,13 @@ jobs:
             exit 1
           fi
 
-          espeak-ng \
-            -v ru \
-            -s 145 \
-            -a 160 \
-            -w output/voice.wav \
-            "$VIDEO_SCRIPT"
+          .venv/bin/python -m piper \
+            -m ru_RU-irina-medium \
+            -f output/voice.wav \
+            -- "$VIDEO_SCRIPT"
 
           test -s output/voice.wav
-          echo "Russian voiceover created."
+          echo "Russian neural voiceover created."
 
       - name: Render MP4 video
         env:
