@@ -4,171 +4,285 @@ on:
   workflow_dispatch:
     inputs:
       title:
-        description: "Video title"
+        description: "Заголовок видео"
         required: true
+        default: "Мой новый Shorts"
         type: string
-        default: "Gold facts"
+
       script:
-        description: "Video text"
+        description: "Текст для видео"
         required: true
+        default: "Подпишись на канал, чтобы увидеть новые видео!"
         type: string
-        default: "Gold is a rare metal. Gold is used in electronics and medicine. Subscribe for more facts!"
+
       duration:
-        description: "Duration in seconds"
+        description: "Длительность видео в секундах"
         required: true
+        default: "15"
         type: choice
         options:
           - "15"
           - "20"
           - "30"
-        default: "15"
 
 permissions:
   contents: read
 
 jobs:
   generate:
-    name: Generate vertical MP4
+    name: Create vertical video
     runs-on: ubuntu-24.04
     timeout-minutes: 15
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Install dependencies
+        timeout-minutes: 5
         run: |
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg python3-pil fonts-dejavu-core
+          set -e
+
+          echo "Changing Ubuntu package mirror..."
+
+          if [ -f /etc/apt/sources.list.d/ubuntu.sources ]; then
+            sudo sed -i \
+              's|azure.archive.ubuntu.com|archive.ubuntu.com|g' \
+              /etc/apt/sources.list.d/ubuntu.sources
+          fi
+
+          echo "Updating package lists..."
+
+          sudo apt-get \
+            -o Acquire::Retries=1 \
+            -o Acquire::http::Timeout=15 \
+            -o Acquire::https::Timeout=15 \
+            update
+
+          echo "Installing FFmpeg, Pillow and fonts..."
+
+          sudo apt-get \
+            -o Acquire::Retries=1 \
+            -o Acquire::http::Timeout=15 \
+            -o Acquire::https::Timeout=15 \
+            install -y --no-install-recommends \
+            ffmpeg \
+            python3-pil \
+            fonts-dejavu-core
+
+          echo "Checking installed programs..."
           ffmpeg -version
           python3 --version
 
+      - name: Prepare output directory
+        run: |
+          mkdir -p output
+          rm -f output/short.png output/short.mp4
+
       - name: Create video image
         env:
-          TITLE: ${{ inputs.title }}
-          SCRIPT: ${{ inputs.script }}
+          VIDEO_TITLE: ${{ inputs.title }}
+          VIDEO_SCRIPT: ${{ inputs.script }}
         run: |
-          set -e
-          mkdir -p output
-
-          cat > /tmp/create.py <<'PY'
+          cat > create_image.py <<'PYTHON'
           import os
           from PIL import Image, ImageDraw, ImageFont
+          import textwrap
 
-          W, H = 1080, 1920
-          title = os.environ["TITLE"].strip()[:160]
-          script = os.environ["SCRIPT"].strip()[:1200]
+          WIDTH = 1080
+          HEIGHT = 1920
 
-          img = Image.new("RGB", (W, H), (15, 25, 55))
-          draw = ImageDraw.Draw(img)
+          title = os.environ.get("VIDEO_TITLE", "Мой новый Shorts")
+          script = os.environ.get(
+              "VIDEO_SCRIPT",
+              "Подпишись на канал, чтобы увидеть новые видео!"
+          )
 
-          bold = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
-          regular = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+          image = Image.new("RGB", (WIDTH, HEIGHT), (14, 20, 40))
+          draw = ImageDraw.Draw(image)
 
-          title_font = ImageFont.truetype(bold, 58)
-          body_font = ImageFont.truetype(regular, 40)
-          footer_font = ImageFont.truetype(bold, 30)
+          # Градиентный фон
+          top = (15, 25, 55)
+          bottom = (85, 25, 105)
 
-          def wrap(text, font, limit):
-              result, line = [], ""
-              for word in text.split():
-                  test = (line + " " + word).strip()
-                  width = draw.textbbox((0, 0), test, font=font)[2]
-                  if width <= limit:
-                      line = test
+          for y in range(HEIGHT):
+              ratio = y / HEIGHT
+              color = tuple(
+                  int(top[i] * (1 - ratio) + bottom[i] * ratio)
+                  for i in range(3)
+              )
+              draw.line((0, y, WIDTH, y), fill=color)
+
+          # Декоративные элементы
+          draw.ellipse(
+              (760, 120, 1250, 610),
+              fill=(45, 55, 115)
+          )
+          draw.ellipse(
+              (-180, 1350, 350, 1880),
+              fill=(50, 35, 100)
+          )
+
+          font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+          regular_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+
+          title_font = ImageFont.truetype(font_path, 68)
+          body_font = ImageFont.truetype(regular_path, 54)
+          small_font = ImageFont.truetype(font_path, 34)
+
+          def wrap_text(text, font, max_width):
+              words = text.split()
+              lines = []
+              current = ""
+
+              for word in words:
+                  candidate = word if not current else current + " " + word
+                  if draw.textbbox((0, 0), candidate, font=font)[2] <= max_width:
+                      current = candidate
                   else:
-                      if line:
-                          result.append(line)
-                      line = word
-              if line:
-                  result.append(line)
-              return result
+                      if current:
+                          lines.append(current)
+                      current = word
+
+              if current:
+                  lines.append(current)
+
+              return lines or [""]
+
+          def draw_centered_block(text, font, center_y, max_width, fill, spacing=24):
+              lines = wrap_text(text, font, max_width)
+              heights = [
+                  draw.textbbox((0, 0), line, font=font)[3]
+                  - draw.textbbox((0, 0), line, font=font)[1]
+                  for line in lines
+              ]
+              total_height = sum(heights) + spacing * (len(lines) - 1)
+              y = center_y - total_height / 2
+
+              for line, line_height in zip(lines, heights):
+                  bbox = draw.textbbox((0, 0), line, font=font)
+                  line_width = bbox[2] - bbox[0]
+                  x = (WIDTH - line_width) / 2
+                  draw.text((x, y), line, font=font, fill=fill)
+                  y += line_height + spacing
+
+          # Верхняя подпись
+          label = "YOUTUBE SHORTS"
+          label_bbox = draw.textbbox((0, 0), label, font=small_font)
+          label_width = label_bbox[2] - label_bbox[0]
+          draw.text(
+              ((WIDTH - label_width) / 2, 270),
+              label,
+              font=small_font,
+              fill=(255, 210, 90)
+          )
+
+          # Заголовок
+          draw_centered_block(
+              title,
+              title_font,
+              650,
+              900,
+              (255, 255, 255),
+              spacing=26
+          )
+
+          # Разделительная линия
+          draw.rounded_rectangle(
+              (340, 920, 740, 934),
+              radius=7,
+              fill=(255, 210, 90)
+          )
+
+          # Основной текст
+          draw_centered_block(
+              script,
+              body_font,
+              1190,
+              880,
+              (240, 242, 255),
+              spacing=28
+          )
+
+          # Нижняя подпись
+          footer = "ПОДПИШИСЬ НА КАНАЛ"
+          footer_bbox = draw.textbbox((0, 0), footer, font=small_font)
+          footer_width = footer_bbox[2] - footer_bbox[0]
 
           draw.rounded_rectangle(
-              (45, 130, 1035, 1790),
-              radius=35,
-              fill=(25, 43, 80),
-              outline=(70, 140, 220),
-              width=4
+              (150, 1570, 930, 1665),
+              radius=28,
+              fill=(255, 65, 95)
           )
-
-          y = 230
-          for line in wrap(title, title_font, 850)[:5]:
-              draw.text(
-                  (95, y), line,
-                  font=title_font,
-                  fill=(255, 210, 80)
-              )
-              y += 85
-
-          y += 55
-          for line in wrap(script, body_font, 850):
-              if y > 1500:
-                  break
-              draw.text(
-                  (95, y), line,
-                  font=body_font,
-                  fill="white"
-              )
-              y += 65
 
           draw.text(
-              (95, 1650),
-              "SUBSCRIBE FOR MORE",
-              font=footer_font,
-              fill=(90, 205, 255)
+              ((WIDTH - footer_width) / 2, 1598),
+              footer,
+              font=small_font,
+              fill=(255, 255, 255)
           )
 
-          img.save("output/short.png")
-          PY
+          image.save("output/short.png")
+          print("Image created: output/short.png")
+          print(f"Title: {title}")
+          print(f"Script: {script}")
+          PYTHON
 
-          python3 /tmp/create.py
-          test -s output/short.png
+          python3 create_image.py
 
-      - name: Encode MP4
+      - name: Render MP4 video
         env:
-          DURATION: ${{ inputs.duration }}
+          VIDEO_DURATION: ${{ inputs.duration }}
         run: |
           set -e
 
-          case "$DURATION" in
-            15|20|30) ;;
-            *)
-              echo "Invalid video duration: $DURATION"
-              exit 1
-              ;;
-          esac
+          DURATION="${VIDEO_DURATION:-15}"
 
-          ffmpeg -y \
+          echo "Rendering ${DURATION}-second video..."
+
+          ffmpeg \
+            -hide_banner \
+            -loglevel error \
+            -y \
             -loop 1 \
             -framerate 30 \
             -i output/short.png \
             -t "$DURATION" \
-            -vf "scale=1080:1920,format=yuv420p" \
+            -r 30 \
+            -vf "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,format=yuv420p" \
             -c:v libx264 \
             -preset ultrafast \
-            -crf 28 \
-            -r 30 \
-            -an \
+            -crf 23 \
             -movflags +faststart \
+            -an \
             output/short.mp4
 
-      - name: Verify MP4
+          echo "Video rendered successfully."
+
+      - name: Verify generated video
         run: |
           set -e
 
+          test -s output/short.png
           test -s output/short.mp4
 
-          ffprobe -v error \
-            -select_streams v:0 \
-            -show_entries stream=codec_name,width,height \
-            -show_entries format=duration \
+          echo "Video information:"
+          ffprobe \
+            -v error \
+            -show_entries format=duration,size,format_name \
+            -show_entries stream=codec_name,width,height,r_frame_rate \
             -of default=noprint_wrappers=1 \
             output/short.mp4
 
-          ls -lh output/short.mp4
+          echo "Generated files:"
+          ls -lh output/
 
-      - name: Upload video
+      - name: Upload generated video
         uses: actions/upload-artifact@v4
         with:
           name: generated-text-short
-          path: output/short.mp4
+          path: |
+            output/short.mp4
+            output/short.png
           retention-days: 7
           if-no-files-found: error
