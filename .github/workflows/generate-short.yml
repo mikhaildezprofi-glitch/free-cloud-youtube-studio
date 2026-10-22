@@ -1,20 +1,20 @@
 name: Generate YouTube Short
 
-on:
+"on":
 workflow_dispatch:
 inputs:
 title:
-description: "Заголовок видео"
+description: Video title
 required: true
 type: string
-default: "5 интересных фактов о золоте"
+default: "5 interesting facts about gold"
 script:
-description: "Текст для видео"
+description: Video text
 required: true
 type: string
-default: "Золото — один из самых редких металлов. Оно почти не окисляется. Золото используют в электронике и медицине. Большая часть добытого золота сохраняется до сих пор. Подписывайтесь на канал!"
+default: "Gold is a rare metal. It does not rust easily. Gold is used in electronics and medicine. Much of the gold ever mined still exists today. Subscribe for more facts!"
 duration:
-description: "Длительность видео"
+description: Video duration in seconds
 required: true
 type: choice
 options:
@@ -30,14 +30,13 @@ jobs:
 generate:
 runs-on: ubuntu-24.04
 timeout-minutes: 10
-
 steps:
-  - name: Install dependencies
-    run: |
-      sudo apt-get update
-      sudo apt-get install -y ffmpeg python3-pil fonts-dejavu-core
+- name: Install FFmpeg and fonts
+run: |
+sudo apt-get update
+sudo apt-get install -y ffmpeg python3-pil fonts-dejavu-core
 
-  - name: Generate vertical video
+  - name: Generate video
     env:
       VIDEO_TITLE: ${{ inputs.title }}
       VIDEO_SCRIPT: ${{ inputs.script }}
@@ -45,72 +44,86 @@ steps:
     run: |
       mkdir -p output
       cat > /tmp/create_short.py <<'PY'
-      import os, textwrap
+      import os
       from PIL import Image, ImageDraw, ImageFont
 
       W, H = 1080, 1920
-      title = os.environ["VIDEO_TITLE"].strip()[:160]
-      script = os.environ["VIDEO_SCRIPT"].strip()[:1200]
+      title = os.environ["VIDEO_TITLE"][:160]
+      script = os.environ["VIDEO_SCRIPT"][:1200]
       duration = int(os.environ["VIDEO_DURATION"])
+
       img = Image.new("RGB", (W, H), (12, 22, 45))
       draw = ImageDraw.Draw(img)
 
       for y in range(H):
           t = y / H
-          color = (int(12 + 18*t), int(22 + 12*t), int(45 + 35*t))
-          draw.line((0, y, W, y), fill=color)
+          draw.line(
+              (0, y, W, y),
+              fill=(int(12 + 18*t), int(22 + 12*t), int(45 + 35*t))
+          )
 
-      font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
-      regular_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
-      title_font = ImageFont.truetype(font_path, 68)
-      body_font = ImageFont.truetype(regular_path, 43)
-      footer_font = ImageFont.truetype(font_path, 32)
+      bold = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+      regular = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+      title_font = ImageFont.truetype(bold, 65)
+      body_font = ImageFont.truetype(regular, 42)
+      footer_font = ImageFont.truetype(bold, 30)
 
-      def wrap_pixels(text, font, max_width):
-          words = text.split()
-          lines, line = [], ""
-          for word in words:
-              candidate = (line + " " + word).strip()
+      def wrap(text, font, max_width):
+          lines, current = [], ""
+          for word in text.split():
+              candidate = (current + " " + word).strip()
               if draw.textbbox((0, 0), candidate, font=font)[2] <= max_width:
-                  line = candidate
+                  current = candidate
               else:
-                  if line:
-                      lines.append(line)
-                  line = word
-          if line:
-              lines.append(line)
+                  if current:
+                      lines.append(current)
+                  current = word
+          if current:
+              lines.append(current)
           return lines
 
-      draw.rounded_rectangle((55, 160, 1025, 1760), radius=42,
-                             fill=(18, 34, 65), outline=(60, 120, 190), width=4)
-      y = 260
-      for line in wrap_pixels(title, title_font, 850)[:5]:
-          draw.text((95, y), line, font=title_font, fill=(255, 211, 90))
-          y += 92
+      draw.rounded_rectangle(
+          (55, 150, 1025, 1770),
+          radius=40,
+          fill=(18, 34, 65),
+          outline=(60, 120, 190),
+          width=4
+      )
 
-      y += 65
+      y = 250
+      for line in wrap(title, title_font, 850)[:5]:
+          draw.text((100, y), line, font=title_font, fill=(255, 211, 90))
+          y += 90
+
+      y += 55
       for paragraph in script.splitlines():
-          for line in wrap_pixels(paragraph, body_font, 850):
+          for line in wrap(paragraph, body_font, 850):
               if y > 1480:
                   break
               draw.text((100, y), line, font=body_font, fill=(245, 247, 255))
-              y += 65
-          y += 20
+              y += 62
+          y += 18
           if y > 1480:
               break
 
-      draw.text((100, 1630), "ПОДПИШИСЬ • НОВЫЕ ВИДЕО", font=footer_font,
-                fill=(90, 205, 255))
-      img.save("output/short.png")
-
-      os.system(
-          f'ffmpeg -y -loop 1 -i output/short.png '
-          f'-t {duration} -r 30 -vf "scale=1080:1920,format=yuv420p" '
-          f'-c:v libx264 -preset veryfast -crf 23 '
-          f'-movflags +faststart output/short.mp4'
+      draw.text(
+          (100, 1640),
+          "SUBSCRIBE FOR MORE",
+          font=footer_font,
+          fill=(90, 205, 255)
       )
+      img.save("output/short.png")
       PY
+
       python3 /tmp/create_short.py
+
+      ffmpeg -y -loop 1 -i output/short.png \
+        -t "$VIDEO_DURATION" -r 30 \
+        -vf "scale=1080:1920,format=yuv420p" \
+        -c:v libx264 -preset veryfast -crf 23 \
+        -movflags +faststart output/short.mp4
+
+      test -s output/short.mp4
       ffprobe -v error -select_streams v:0 \
         -show_entries stream=width,height,codec_name \
         -show_entries format=duration \
