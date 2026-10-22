@@ -1,0 +1,46 @@
+name: Build Test Short
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-test-short:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes ffmpeg fonts-dejavu-core
+
+      - name: Create vertical test video
+        run: |
+          mkdir -p output
+          ffmpeg -hide_banner -y \
+            -f lavfi -i "color=c=0x101827:s=1080x1920:r=30:d=6" \
+            -vf "drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:text='CLOUD STUDIO':fontcolor=white:fontsize=86:x=(w-text_w)/2:y=h*0.38,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:text='TEST SHORT 9:16':fontcolor=0x67E8F9:fontsize=54:x=(w-text_w)/2:y=h*0.48,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:text='Generated in GitHub Actions':fontcolor=white:fontsize=34:x=(w-text_w)/2:y=h*0.56" \
+            -c:v libx264 -preset veryfast -pix_fmt yuv420p -movflags +faststart \
+            output/test-short.mp4
+
+      - name: Verify generated video
+        run: |
+          test -s output/test-short.mp4
+          ffprobe -v error -select_streams v:0 \
+            -show_entries stream=width,height,codec_name \
+            -show_entries format=duration,size \
+            -of default=noprint_wrappers=1 output/test-short.mp4
+
+      - name: Upload test video
+        uses: actions/upload-artifact@v6
+        with:
+          name: cloud-studio-test-short
+          path: output/test-short.mp4
+          if-no-files-found: error
+          retention-days: 7
