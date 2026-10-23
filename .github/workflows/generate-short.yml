@@ -200,7 +200,7 @@ jobs:
 
           echo "Generated files:"
           ls -lh output/
-          - name: Run strict MP4 quality gate
+      - name: Run strict MP4 quality gate
         run: |
           set -e
           python3 scripts/validate_video.py \
