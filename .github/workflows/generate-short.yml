@@ -200,6 +200,12 @@ jobs:
 
           echo "Generated files:"
           ls -lh output/
+          - name: Run strict MP4 quality gate
+        run: |
+          set -e
+          python3 scripts/validate_video.py \
+            --file output/short.mp4 \
+            --expected-duration "${{ inputs.duration }}"
 
       - name: Upload generated video
         uses: actions/upload-artifact@v6
