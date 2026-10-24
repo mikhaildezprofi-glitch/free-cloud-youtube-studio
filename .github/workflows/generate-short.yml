@@ -19,6 +19,17 @@ on:
           - "20"
           - "30"
 
+      voice:
+        description: "Голос русской озвучки"
+        required: true
+        default: "ru_RU-irina-medium"
+        type: choice
+        options:
+          - "ru_RU-irina-medium"
+          - "ru_RU-denis-medium"
+          - "ru_RU-dmitri-medium"
+          - "ru_RU-ruslan-medium"
+
 permissions:
   contents: read
 
@@ -67,16 +78,27 @@ jobs:
 
       - name: Download neural Russian voice
         timeout-minutes: 5
+        env:
+          PIPER_VOICE_MODEL: ${{ inputs.voice }}
         run: |
           set -e
 
+          case "$PIPER_VOICE_MODEL" in
+            ru_RU-irina-medium|ru_RU-denis-medium|ru_RU-dmitri-medium|ru_RU-ruslan-medium)
+              ;;
+            *)
+              echo "Unsupported voice: $PIPER_VOICE_MODEL"
+              exit 1
+              ;;
+          esac
+
           .venv/bin/python -m piper.download_voices \
-            ru_RU-irina-medium
+            "$PIPER_VOICE_MODEL"
 
-          test -s ru_RU-irina-medium.onnx
-          test -s ru_RU-irina-medium.onnx.json
+          test -s "$PIPER_VOICE_MODEL.onnx"
+          test -s "$PIPER_VOICE_MODEL.onnx.json"
 
-          echo "Piper Russian voice downloaded."
+          echo "Piper voice downloaded: $PIPER_VOICE_MODEL"
 
       - name: Prepare output directory
         run: |
@@ -127,6 +149,7 @@ jobs:
       - name: Generate Russian neural voice
         env:
           VIDEO_SCRIPT: ${{ inputs.script }}
+          PIPER_VOICE_MODEL: ${{ inputs.voice }}
         run: |
           set -e
 
@@ -136,12 +159,12 @@ jobs:
           fi
 
           .venv/bin/python -m piper \
-            -m ru_RU-irina-medium \
+            -m "$PIPER_VOICE_MODEL" \
             -f output/voice.wav \
             -- "$VIDEO_SCRIPT"
 
           test -s output/voice.wav
-          echo "Russian neural voiceover created."
+          echo "Russian neural voiceover created: $PIPER_VOICE_MODEL"
 
       - name: Render MP4 video
         env:
@@ -200,6 +223,7 @@ jobs:
 
           echo "Generated files:"
           ls -lh output/
+
       - name: Run strict MP4 quality gate
         run: |
           set -e
