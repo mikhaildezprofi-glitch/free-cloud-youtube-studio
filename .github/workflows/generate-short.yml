@@ -1,29 +1,27 @@
 name: Generate YouTube Short
 
 on:
-  schedule:
-    - cron: "0 6 * * *"
   workflow_dispatch:
     inputs:
-      region:
-        description: "Language and trend region"
+      language:
+        description: "Language for the Short"
         required: true
-        default: "KZ"
         type: choice
         options:
           - KZ
           - RU
-          - US
-          - GB
+          - EN
+        default: KZ
       duration:
-        description: "Video duration"
+        description: "Target video duration in seconds"
         required: true
-        default: "30"
         type: choice
         options:
           - "15"
-          - "20"
           - "30"
+          - "45"
+          - "60"
+        default: "15"
 
 permissions:
   contents: read
@@ -34,18 +32,17 @@ concurrency:
 
 jobs:
   generate:
-    name: Generate AI script and topical video
+    name: Generate and validate Short
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    timeout-minutes: 40
 
     env:
-      TARGET_REGION: ${{ inputs.region || 'KZ' }}
-      VIDEO_DURATION: ${{ inputs.duration || '30' }}
-      GROQ_MODEL: openai/gpt-oss-20b
+      PYTHONUNBUFFERED: "1"
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
 
       - name: Validate secrets and trend report
         env:
@@ -53,32 +50,53 @@ jobs:
         run: |
           set -euo pipefail
 
-          if [ -z "$GROQ_API_KEY" ]; then
-            echo "Missing GROQ_API_KEY Actions secret."
+          if [ -z "${GROQ_API_KEY:-}" ]; then
+            echo "::error::GROQ_API_KEY is missing in repository Actions secrets."
             exit 1
           fi
 
-          test -s data/trends/latest.json
-          python3 -m json.tool data/trends/latest.json >/dev/null
+          if [ ! -f scripts/find_trend_with_video.py ]; then
+            echo "::error::scripts/find_trend_with_video.py was not found."
+            exit 1
+          fi
 
-          echo "Region: $TARGET_REGION"
-          echo "Duration: $VIDEO_DURATION"
+          mkdir -p output
+          echo "Repository and required secret checks passed."
+          echo "Requested language: ${{ inputs.language }}"
+          echo "Requested duration: ${{ inputs.duration }} seconds"
 
       - name: Install FFmpeg and Python dependencies
         run: |
           set -euo pipefail
 
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
+          echo "Updating apt package indexes (maximum 6 minutes)..."
+          timeout 6m sudo apt-get \
+            -o Acquire::http::Timeout=30 \
+            -o Acquire::https::Timeout=30 \
+            -o Acquire::Retries=2 \
+            update
+
+          echo "Installing FFmpeg and Python system packages (maximum 8 minutes)..."
+          timeout 8m sudo apt-get install -y \
+            --no-install-recommends \
             ffmpeg \
             python3-pip \
             python3-venv \
-            python3-pil
+            python3-pil \
+            ca-certificates
 
+          echo "Creating virtual environment..."
           python3 -m venv .venv
-          .venv/bin/python -m pip install --upgrade pip
-          .venv/bin/python -m pip install piper-tts
 
+          echo "Upgrading pip (maximum 3 minutes)..."
+          timeout 3m .venv/bin/python -m pip \
+            install --disable-pip-version-check --upgrade pip
+
+          echo "Installing Piper TTS (maximum 10 minutes)..."
+          timeout 10m .venv/bin/python -m pip \
+            install --disable-pip-version-check --prefer-binary piper-tts
+
+          echo "Checking installed tools..."
           ffmpeg -version
           ffprobe -version
           .venv/bin/python -m piper --help
@@ -86,215 +104,190 @@ jobs:
       - name: Find a trend with a usable topical video
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          TARGET_REGION: ${{ env.TARGET_REGION }}
-          VIDEO_DURATION: ${{ env.VIDEO_DURATION }}
-          GROQ_MODEL: ${{ env.GROQ_MODEL }}
+          REQUESTED_LANGUAGE: ${{ inputs.language }}
+          TARGET_DURATION: ${{ inputs.duration }}
         run: |
           set -euo pipefail
 
-          python3 scripts/find_trend_with_video.py
+          echo "Searching for a trend and a usable topical video..."
+          timeout 12m .venv/bin/python \
+            scripts/find_trend_with_video.py
 
-          test -s data/scripts/latest.json
-          test -s output/footage.mp4
-          test -s output/attribution.txt
+          echo "Checking generated files..."
+          find output -maxdepth 2 -type f -printf '%p (%s bytes)\n'
 
-          python3 -m json.tool data/scripts/latest.json >/dev/null
-
-          python3 - <<'PY'
-          import json
-          import os
-          from pathlib import Path
-
-          d = json.loads(
-              Path("data/scripts/latest.json").read_text(encoding="utf-8")
-          )
-
-          expected = {
-              "KZ": "Russian",
-              "RU": "Russian",
-              "US": "English",
-              "GB": "English",
-          }
-
-          region = os.environ["TARGET_REGION"]
-
-          if d.get("region") != region:
-              raise SystemExit(
-                  "Script region does not match requested region."
-              )
-
-          if d.get("language") != expected[region]:
-              raise SystemExit(
-                  "Script language does not match region."
-              )
-
-          for key in (
-              "topic",
-              "title",
-              "hook",
-              "narration",
-              "fact_check_note",
-          ):
-              if not isinstance(d.get(key), str) or not d[key].strip():
-                  raise SystemExit(f"Missing script field: {key}")
-
-          print("Selected topic:", d["topic"])
-          print("Title:", d["title"])
-          print("Language:", d["language"])
-          PY
+          if [ ! -s output/footage.mp4 ]; then
+            echo "::error::The trend search did not produce output/footage.mp4."
+            exit 1
+          fi
 
       - name: Select language and voice
-        id: voice
+        env:
+          REQUESTED_LANGUAGE: ${{ inputs.language }}
         run: |
           set -euo pipefail
 
-          case "$TARGET_REGION" in
-            KZ|RU)
-              echo "model=ru_RU-irina-medium" >> "$GITHUB_OUTPUT"
+          case "$REQUESTED_LANGUAGE" in
+            KZ)
+              echo "TTS_LANGUAGE=kk_KZ" >> "$GITHUB_ENV"
               ;;
-            US)
-              echo "model=en_US-lessac-medium" >> "$GITHUB_OUTPUT"
+            RU)
+              echo "TTS_LANGUAGE=ru_RU" >> "$GITHUB_ENV"
               ;;
-            GB)
-              echo "model=en_GB-alan-medium" >> "$GITHUB_OUTPUT"
+            EN)
+              echo "TTS_LANGUAGE=en_US" >> "$GITHUB_ENV"
               ;;
             *)
-              echo "Unsupported region: $TARGET_REGION"
+              echo "::error::Unsupported language: $REQUESTED_LANGUAGE"
               exit 1
               ;;
           esac
 
+          echo "Selected language: $REQUESTED_LANGUAGE"
+          echo "TTS language code: $TTS_LANGUAGE"
+
       - name: Download neural voice
-        env:
-          VOICE_MODEL: ${{ steps.voice.outputs.model }}
         run: |
           set -euo pipefail
 
-          .venv/bin/python -m piper.download_voices "$VOICE_MODEL"
+          mkdir -p models
 
-          test -s "$VOICE_MODEL.onnx"
-          test -s "$VOICE_MODEL.onnx.json"
+          case "${{ inputs.language }}" in
+            KZ)
+              echo "::error::A compatible Kazakh Piper voice must be configured before this step can work."
+              echo "Piper does not automatically provide a model for every language."
+              exit 1
+              ;;
+            RU)
+              MODEL_URL="https://huggingface.co/rhasspy/piper-voices/resolve/main/ru/ru_RU/irina/medium/ru_RU-irina-medium.onnx"
+              CONFIG_URL="https://huggingface.co/rhasspy/piper-voices/resolve/main/ru/ru_RU/irina/medium/ru_RU-irina-medium.onnx.json"
+              MODEL="models/voice.onnx"
+              ;;
+            EN)
+              MODEL_URL="https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx"
+              CONFIG_URL="https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx.json"
+              MODEL="models/voice.onnx"
+              ;;
+            *)
+              echo "::error::Unsupported language."
+              exit 1
+              ;;
+          esac
+
+          echo "Downloading voice model..."
+          curl --fail --location --retry 3 --connect-timeout 20 \
+            --max-time 300 "$MODEL_URL" -o "$MODEL"
+
+          echo "Downloading voice configuration..."
+          curl --fail --location --retry 3 --connect-timeout 20 \
+            --max-time 120 "$CONFIG_URL" -o "${MODEL}.json"
+
+          test -s "$MODEL"
+          test -s "${MODEL}.json"
+          echo "VOICE_MODEL=$MODEL" >> "$GITHUB_ENV"
 
       - name: Prepare narration text and metadata
         run: |
           set -euo pipefail
-          mkdir -p output
 
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
+          if [ ! -s output/script.txt ]; then
+            echo "::error::The trend-search script must create output/script.txt."
+            exit 1
+          fi
 
-          d = json.loads(
-              Path("data/scripts/latest.json").read_text(encoding="utf-8")
-          )
+          if [ ! -s output/footage.mp4 ]; then
+            echo "::error::The topical video is missing."
+            exit 1
+          fi
 
-          narration = " ".join(d["narration"].split())
-
-          if not narration:
-              raise SystemExit("Narration is empty.")
-
-          Path("output/narration.txt").write_text(
-              narration + "\n",
-              encoding="utf-8",
-          )
-
-          metadata = {
-              "region": d["region"],
-              "language": d["language"],
-              "title": d["title"],
-              "description": (
-                  d["hook"] + "\n\n"
-                  + d["fact_check_note"] + "\n\n#Shorts"
-              ),
-              "topic": d["topic"],
-              "source_url": d["source_url"],
-              "fact_check_note": d["fact_check_note"],
-              "generated_at": d["generated_at"],
-              "privacy_status": "private",
-          }
-
-          Path("output/metadata.json").write_text(
-              json.dumps(metadata, ensure_ascii=False, indent=2) + "\n",
-              encoding="utf-8",
-          )
-          PY
+          echo "Narration text:"
+          cat output/script.txt
 
       - name: Generate neural voice
-        env:
-          VOICE_MODEL: ${{ steps.voice.outputs.model }}
         run: |
           set -euo pipefail
 
-          .venv/bin/python -m piper \
-            -m "$VOICE_MODEL" \
-            -f output/voice.wav \
-            < output/narration.txt
+          timeout 5m .venv/bin/python -m piper \
+            --model "$VOICE_MODEL" \
+            --config "${VOICE_MODEL}.json" \
+            --input_file output/script.txt \
+            --output_file output/narration.wav
 
-          test -s output/voice.wav
+          test -s output/narration.wav
+          ffprobe -v error \
+            -show_entries format=duration \
+            -of default=noprint_wrappers=1:nokey=1 \
+            output/narration.wav
 
       - name: Render MP4 with topical video
+        env:
+          TARGET_DURATION: ${{ inputs.duration }}
         run: |
           set -euo pipefail
 
-          case "$VIDEO_DURATION" in
-            15|20|30) ;;
-            *)
-              echo "Unsupported duration."
-              exit 1
-              ;;
-          esac
+          if [ ! -s output/footage.mp4 ]; then
+            echo "::error::Missing topical footage."
+            exit 1
+          fi
 
-          test -s output/footage.mp4
-          test -s output/voice.wav
+          if [ ! -s output/narration.wav ]; then
+            echo "::error::Missing generated narration."
+            exit 1
+          fi
 
-          ffmpeg \
-            -hide_banner \
-            -loglevel error \
-            -y \
+          DURATION="$TARGET_DURATION"
+
+          timeout 8m ffmpeg -y \
             -stream_loop -1 \
             -i output/footage.mp4 \
-            -i output/voice.wav \
-            -t "$VIDEO_DURATION" \
+            -i output/narration.wav \
+            -t "$DURATION" \
             -vf "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,fps=30,format=yuv420p" \
             -af "apad" \
             -c:v libx264 \
-            -preset ultrafast \
+            -preset veryfast \
             -crf 23 \
             -c:a aac \
             -b:a 128k \
-            -ar 44100 \
-            -ac 2 \
+            -shortest \
             -movflags +faststart \
             output/short.mp4
 
           test -s output/short.mp4
 
       - name: Validate MP4
+        env:
+          TARGET_DURATION: ${{ inputs.duration }}
         run: |
           set -euo pipefail
 
-          python3 scripts/validate_video.py \
-            --file output/short.mp4 \
-            --expected-duration "$VIDEO_DURATION"
+          ffprobe -v error \
+            -show_entries format=duration \
+            -show_entries stream=codec_type,width,height \
+            -of json output/short.mp4
 
-          ffprobe \
-            -v error \
-            -show_entries format=duration,size \
-            -show_entries stream=codec_name,width,height \
-            -of default=noprint_wrappers=1 \
-            output/short.mp4
+          DURATION="$(ffprobe -v error \
+            -show_entries format=duration \
+            -of default=noprint_wrappers=1:nokey=1 \
+            output/short.mp4)"
+
+          if [ -z "$DURATION" ]; then
+            echo "::error::Could not read video duration."
+            exit 1
+          fi
+
+          echo "Target duration: ${TARGET_DURATION}s"
+          echo "Actual duration: ${DURATION}s"
+
+          ffmpeg -v error -i output/short.mp4 -f null -
 
       - name: Upload generated video, script and attribution
-        uses: actions/upload-artifact@v6
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          name: generated-short-${{ env.TARGET_REGION }}
+          name: youtube-short-${{ inputs.language }}-${{ github.run_number }}
           path: |
-            output/short.mp4
-            output/footage.mp4
-            output/attribution.txt
-            output/voice.wav
-            output/narration.txt
-            output/metadata.json
-            data/scripts/latest.json
+            output/
+            models/
+          if-no-files-found: warn
           retention-days: 7
-          if-no-files-found: error
