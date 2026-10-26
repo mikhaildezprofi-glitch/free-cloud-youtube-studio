@@ -1,0 +1,115 @@
+name: Test AI Scriptwriter
+
+on:
+  workflow_dispatch:
+    inputs:
+      region:
+        description: "Region for the test script"
+        required: true
+        type: choice
+        options:
+          - KZ
+          - RU
+          - US
+          - GB
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ai-scriptwriter-test
+  cancel-in-progress: false
+
+jobs:
+  scriptwriter:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Generate script
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          TARGET_REGION: ${{ inputs.region }}
+          GROQ_MODEL: openai/gpt-oss-20b
+        run: |
+          set -euo pipefail
+
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          path = Path("data/trends/latest.json")
+          data = json.loads(path.read_text(encoding="utf-8"))
+          entries = data.get("shortlist") or data.get("candidates") or []
+          region = os.environ["TARGET_REGION"]
+
+          filtered = []
+          for item in entries:
+              regions = item.get("regions", [])
+              if item.get("region") == region or region in regions:
+                  filtered.append(item)
+
+          if not filtered:
+              raise SystemExit(
+                  f"No current trend topics for region {region}. "
+                  "Run Discover Shorts Trends first."
+              )
+
+          data["shortlist"] = filtered
+          path = Path("data/trends/test_region.json")
+          path.parent.mkdir(parents=True, exist_ok=True)
+          path.write_text(
+              json.dumps(data, ensure_ascii=False, indent=2),
+              encoding="utf-8"
+          )
+          PY
+
+          # The script normally reads latest.json.
+          cp data/trends/latest.json data/trends/latest.backup.json
+          cp data/trends/test_region.json data/trends/latest.json
+
+          restore() {
+            mv data/trends/latest.backup.json data/trends/latest.json
+          }
+          trap restore EXIT
+
+          python3 scripts/generate_ai_script.py
+
+          python3 -m json.tool data/scripts/latest.json >/dev/null
+
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d = json.loads(Path("data/scripts/latest.json").read_text(encoding="utf-8"))
+          print("\n--- GENERATED SCRIPT ---")
+          print("Region:", d["region"])
+          print("Language:", d["language"])
+          print("Topic:", d["topic"])
+          print("Title:", d["title"])
+          print("\nHook:", d["hook"])
+          print("\nNarration:\n" + d["narration"])
+          print("\nWord count:", d["word_count"])
+          print("Source:", d["source_url"])
+          print("Fact check:", d["fact_check_note"])
+          PY
+
+      - name: Save generated script
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add data/scripts/latest.json
+          git diff --cached --quiet && {
+            echo "No changes to commit."
+            exit 0
+          }
+
+          git commit -m "Generate AI script from regional trends"
+          git push
