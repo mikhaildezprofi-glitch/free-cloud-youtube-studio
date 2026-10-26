@@ -74,14 +74,10 @@ jobs:
       - name: Install FFmpeg and Python dependencies
         run: |
           set -euo pipefail
-
-          echo "Installing FFmpeg..."
           sudo apt-get update
           sudo apt-get install -y ffmpeg
-
           command -v ffmpeg
           command -v ffprobe
-          ffmpeg -version | head -n 2
 
           python -m venv .venv
           .venv/bin/python -m pip install --upgrade pip
@@ -97,6 +93,7 @@ jobs:
       - name: Find a trend with a usable topical video
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
           TARGET_REGION: ${{ inputs.language }}
           VIDEO_DURATION: ${{ inputs.duration }}
         run: |
@@ -163,7 +160,7 @@ jobs:
           set -euo pipefail
 
           if [ ! -s "$VOICE_MODEL" ] || [ ! -s "${VOICE_MODEL}.json" ]; then
-            echo "Downloading voice model..."
+            mkdir -p models
             curl --fail --location --retry 3 --connect-timeout 20 \
               --max-time 300 "$VOICE_URL" -o "$VOICE_MODEL"
             curl --fail --location --retry 3 --connect-timeout 20 \
