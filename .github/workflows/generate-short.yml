@@ -1,14 +1,16 @@
 name: Generate YouTube Short
 
 on:
+  schedule:
+    # Каждый день в 11:00 по времени Казахстана (UTC+5)
+    - cron: "0 6 * * *"
   workflow_dispatch:
     inputs:
       script:
-        description: "Сценарий русской озвучки — без текста на экране"
-        required: true
-        default: "Добро пожаловать! Сегодня вас ждёт что-то интересное."
+        description: "Сценарий озвучки; пустое поле = факт дня"
+        required: false
+        default: ""
         type: string
-
       duration:
         description: "Длительность видео в секундах"
         required: true
@@ -18,7 +20,6 @@ on:
           - "15"
           - "20"
           - "30"
-
       voice:
         description: "Голос русской озвучки"
         required: true
@@ -79,7 +80,7 @@ jobs:
       - name: Download neural Russian voice
         timeout-minutes: 5
         env:
-          PIPER_VOICE_MODEL: ${{ inputs.voice }}
+          PIPER_VOICE_MODEL: ${{ inputs.voice || 'ru_RU-irina-medium' }}
         run: |
           set -e
 
@@ -98,7 +99,40 @@ jobs:
           test -s "$PIPER_VOICE_MODEL.onnx"
           test -s "$PIPER_VOICE_MODEL.onnx.json"
 
-          echo "Piper voice downloaded: $PIPER_VOICE_MODEL"
+      - name: Choose script for scheduled generation
+        env:
+          SCRIPT_INPUT: ${{ inputs.script }}
+        run: |
+          set -e
+
+          .venv/bin/python - <<'PYTHON'
+          import os
+          from datetime import datetime, timezone
+
+          supplied = os.environ.get("SCRIPT_INPUT", "").strip()
+
+          scripts = [
+              "У осьминога три сердца, а кровь голубого цвета. Два сердца прокачивают кровь через жабры, а третье снабжает кровью остальные органы.",
+              "На Венере сутки длиннее года. Планета вращается вокруг своей оси медленнее, чем совершает оборот вокруг Солнца.",
+              "У акул скелет состоит преимущественно из хряща, а не из костей. Это делает его более гибким.",
+              "Запах после дождя называют петрикором. Он связан с ароматическими веществами из почвы, которые дождь поднимает в воздух.",
+              "Пчёлы используют особый танец, чтобы сообщать сородичам направление и расстояние до источника пищи.",
+              "Бананы с ботанической точки зрения относятся к ягодам. Название плода зависит от того, как он развивается из цветка.",
+              "У осьминогов голубоватая кровь благодаря содержащему медь белку гемоцианину, который переносит кислород."
+          ]
+
+          day = datetime.now(timezone.utc).timetuple().tm_yday
+          index = (day - 1) % len(scripts)
+          script = supplied or scripts[index]
+
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env:
+              env.write("VIDEO_SCRIPT=" + script.replace("\n", " ").strip() + "\n")
+
+          if supplied:
+              print("Using manually supplied script.")
+          else:
+              print(f"Selected daily fact #{index + 1}.")
+          PYTHON
 
       - name: Prepare output directory
         run: |
@@ -128,19 +162,9 @@ jobs:
               )
               draw.line((0, y, WIDTH, y), fill=color)
 
-          # Декоративные фигуры без текста
-          draw.ellipse(
-              (650, 180, 1280, 810),
-              fill=(28, 48, 105)
-          )
-          draw.ellipse(
-              (-260, 1080, 480, 1820),
-              fill=(76, 24, 100)
-          )
-          draw.ellipse(
-              (330, 650, 820, 1140),
-              fill=(25, 35, 78)
-          )
+          draw.ellipse((650, 180, 1280, 810), fill=(28, 48, 105))
+          draw.ellipse((-260, 1080, 480, 1820), fill=(76, 24, 100))
+          draw.ellipse((330, 650, 820, 1140), fill=(25, 35, 78))
 
           image.save("output/short.png")
           print("Created background without text.")
@@ -148,8 +172,8 @@ jobs:
 
       - name: Generate Russian neural voice
         env:
-          VIDEO_SCRIPT: ${{ inputs.script }}
-          PIPER_VOICE_MODEL: ${{ inputs.voice }}
+          VIDEO_SCRIPT: ${{ env.VIDEO_SCRIPT }}
+          PIPER_VOICE_MODEL: ${{ inputs.voice || 'ru_RU-irina-medium' }}
         run: |
           set -e
 
@@ -164,11 +188,10 @@ jobs:
             -- "$VIDEO_SCRIPT"
 
           test -s output/voice.wav
-          echo "Russian neural voiceover created: $PIPER_VOICE_MODEL"
 
       - name: Render MP4 video
         env:
-          VIDEO_DURATION: ${{ inputs.duration }}
+          VIDEO_DURATION: ${{ inputs.duration || '15' }}
         run: |
           set -e
 
@@ -203,8 +226,6 @@ jobs:
             -movflags +faststart \
             output/short.mp4
 
-          echo "Video rendered successfully."
-
       - name: Verify generated files
         run: |
           set -e
@@ -213,7 +234,6 @@ jobs:
           test -s output/voice.wav
           test -s output/short.mp4
 
-          echo "Video information:"
           ffprobe \
             -v error \
             -show_entries format=duration,size,format_name \
@@ -221,15 +241,16 @@ jobs:
             -of default=noprint_wrappers=1 \
             output/short.mp4
 
-          echo "Generated files:"
           ls -lh output/
 
       - name: Run strict MP4 quality gate
+        env:
+          VIDEO_DURATION: ${{ inputs.duration || '15' }}
         run: |
           set -e
           python3 scripts/validate_video.py \
             --file output/short.mp4 \
-            --expected-duration "${{ inputs.duration }}"
+            --expected-duration "${VIDEO_DURATION:-15}"
 
       - name: Upload generated video
         uses: actions/upload-artifact@v6
