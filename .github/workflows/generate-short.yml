@@ -2,73 +2,78 @@ name: Generate YouTube Short
 
 on:
   schedule:
-    # Каждый день в 11:00 по времени Казахстана (UTC+5)
     - cron: "0 6 * * *"
   workflow_dispatch:
     inputs:
-      script:
-        description: "Сценарий озвучки; пустое поле = факт дня"
-        required: false
-        default: ""
-        type: string
-      duration:
-        description: "Длительность видео в секундах"
+      region:
+        description: "Language and trend region"
         required: true
-        default: "15"
+        default: "KZ"
+        type: choice
+        options:
+          - KZ
+          - RU
+          - US
+          - GB
+      duration:
+        description: "Video duration"
+        required: true
+        default: "30"
         type: choice
         options:
           - "15"
           - "20"
           - "30"
-      voice:
-        description: "Голос русской озвучки"
-        required: true
-        default: "ru_RU-irina-medium"
-        type: choice
-        options:
-          - "ru_RU-irina-medium"
-          - "ru_RU-denis-medium"
-          - "ru_RU-dmitri-medium"
-          - "ru_RU-ruslan-medium"
 
 permissions:
   contents: read
 
+concurrency:
+  group: generate-youtube-short
+  cancel-in-progress: false
+
 jobs:
   generate:
-    name: Create vertical video
+    name: Generate AI script and video
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 25
+
+    env:
+      TARGET_REGION: ${{ inputs.region || 'KZ' }}
+      VIDEO_DURATION: ${{ inputs.duration || '30' }}
+      GROQ_MODEL: openai/gpt-oss-20b
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
 
-      - name: Install dependencies
-        timeout-minutes: 8
+      - name: Validate secrets and trend report
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: |
-          set -e
+          set -euo pipefail
 
-          if [ -f /etc/apt/sources.list.d/ubuntu.sources ]; then
-            sudo sed -i \
-              's|azure.archive.ubuntu.com|archive.ubuntu.com|g' \
-              /etc/apt/sources.list.d/ubuntu.sources
+          if [ -z "$GROQ_API_KEY" ]; then
+            echo "Missing GROQ_API_KEY Actions secret."
+            exit 1
           fi
 
-          sudo apt-get \
-            -o Acquire::Retries=1 \
-            -o Acquire::http::Timeout=15 \
-            -o Acquire::https::Timeout=15 \
-            update
+          test -s data/trends/latest.json
+          python3 -m json.tool data/trends/latest.json >/dev/null
 
-          sudo apt-get \
-            -o Acquire::Retries=1 \
-            -o Acquire::http::Timeout=15 \
-            -o Acquire::https::Timeout=15 \
-            install -y --no-install-recommends \
+          echo "Region: $TARGET_REGION"
+          echo "Duration: $VIDEO_DURATION"
+
+      - name: Install FFmpeg and Python dependencies
+        run: |
+          set -euo pipefail
+
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
             ffmpeg \
-            python3-pil \
-            python3-venv
+            python3-pip \
+            python3-venv \
+            python3-pil
 
           python3 -m venv .venv
           .venv/bin/python -m pip install --upgrade pip
@@ -77,130 +82,181 @@ jobs:
           ffmpeg -version
           .venv/bin/python -m piper --help
 
-      - name: Download neural Russian voice
-        timeout-minutes: 5
+      - name: Generate AI script from trends
         env:
-          PIPER_VOICE_MODEL: ${{ inputs.voice || 'ru_RU-irina-medium' }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          TARGET_REGION: ${{ env.TARGET_REGION }}
+          GROQ_MODEL: openai/gpt-oss-20b
         run: |
-          set -e
+          set -euo pipefail
 
-          case "$PIPER_VOICE_MODEL" in
-            ru_RU-irina-medium|ru_RU-denis-medium|ru_RU-dmitri-medium|ru_RU-ruslan-medium)
+          python3 scripts/generate_ai_script.py
+
+          test -s data/scripts/latest.json
+          python3 -m json.tool data/scripts/latest.json >/dev/null
+
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          d = json.loads(
+              Path("data/scripts/latest.json").read_text(encoding="utf-8")
+          )
+
+          expected = {
+              "KZ": "Russian",
+              "RU": "Russian",
+              "US": "English",
+              "GB": "English",
+          }[d["region"]]
+
+          if d["region"] not in ("KZ", "RU", "US", "GB"):
+              raise SystemExit("Invalid script region.")
+
+          if d["region"] != __import__("os").environ["TARGET_REGION"]:
+              raise SystemExit("Script region does not match requested region.")
+
+          if d["language"] != expected:
+              raise SystemExit("Script language does not match region.")
+
+          for key in ("title", "hook", "narration", "fact_check_note"):
+              if not isinstance(d.get(key), str) or not d[key].strip():
+                  raise SystemExit(f"Missing script field: {key}")
+
+          print("AI script passed basic validation.")
+          print("Region:", d["region"])
+          print("Language:", d["language"])
+          print("Title:", d["title"])
+          print("Word count:", d.get("word_count"))
+          print("Fact-check note:", d["fact_check_note"])
+          PY
+
+      - name: Select language and voice
+        id: voice
+        run: |
+          set -euo pipefail
+
+          case "$TARGET_REGION" in
+            KZ|RU)
+              echo "model=ru_RU-irina-medium" >> "$GITHUB_OUTPUT"
+              ;;
+            US)
+              echo "model=en_US-lessac-medium" >> "$GITHUB_OUTPUT"
+              ;;
+            GB)
+              echo "model=en_GB-alan-medium" >> "$GITHUB_OUTPUT"
               ;;
             *)
-              echo "Unsupported voice: $PIPER_VOICE_MODEL"
+              echo "Unsupported region: $TARGET_REGION"
               exit 1
               ;;
           esac
 
-          .venv/bin/python -m piper.download_voices \
-            "$PIPER_VOICE_MODEL"
-
-          test -s "$PIPER_VOICE_MODEL.onnx"
-          test -s "$PIPER_VOICE_MODEL.onnx.json"
-
-      - name: Choose script for scheduled generation
+      - name: Download neural voice
         env:
-          SCRIPT_INPUT: ${{ inputs.script }}
+          VOICE_MODEL: ${{ steps.voice.outputs.model }}
         run: |
-          set -e
+          set -euo pipefail
 
-          .venv/bin/python - <<'PYTHON'
-          import os
-          from datetime import datetime, timezone
+          .venv/bin/python -m piper.download_voices "$VOICE_MODEL"
 
-          supplied = os.environ.get("SCRIPT_INPUT", "").strip()
+          test -s "$VOICE_MODEL.onnx"
+          test -s "$VOICE_MODEL.onnx.json"
 
-          scripts = [
-              "У осьминога три сердца, а кровь голубого цвета. Два сердца прокачивают кровь через жабры, а третье снабжает кровью остальные органы.",
-              "На Венере сутки длиннее года. Планета вращается вокруг своей оси медленнее, чем совершает оборот вокруг Солнца.",
-              "У акул скелет состоит преимущественно из хряща, а не из костей. Это делает его более гибким.",
-              "Запах после дождя называют петрикором. Он связан с ароматическими веществами из почвы, которые дождь поднимает в воздух.",
-              "Пчёлы используют особый танец, чтобы сообщать сородичам направление и расстояние до источника пищи.",
-              "Бананы с ботанической точки зрения относятся к ягодам. Название плода зависит от того, как он развивается из цветка.",
-              "У осьминогов голубоватая кровь благодаря содержащему медь белку гемоцианину, который переносит кислород."
-          ]
-
-          day = datetime.now(timezone.utc).timetuple().tm_yday
-          index = (day - 1) % len(scripts)
-          script = supplied or scripts[index]
-
-          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env:
-              env.write("VIDEO_SCRIPT=" + script.replace("\n", " ").strip() + "\n")
-
-          if supplied:
-              print("Using manually supplied script.")
-          else:
-              print(f"Selected daily fact #{index + 1}.")
-          PYTHON
-
-      - name: Prepare output directory
+      - name: Prepare narration text
         run: |
-          set -e
+          set -euo pipefail
           mkdir -p output
-          rm -f output/short.png output/short.mp4 output/voice.wav
 
-      - name: Create vertical background without text
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          d = json.loads(
+              Path("data/scripts/latest.json").read_text(encoding="utf-8")
+          )
+
+          narration = " ".join(d["narration"].split())
+          if not narration:
+              raise SystemExit("Narration is empty.")
+
+          Path("output/narration.txt").write_text(
+              narration + "\n",
+              encoding="utf-8",
+          )
+
+          # Save title and description separately for later review/upload.
+          metadata = {
+              "region": d["region"],
+              "language": d["language"],
+              "title": d["title"],
+              "description": (
+                  d["hook"] + "\n\n" +
+                  d["fact_check_note"] + "\n\n#Shorts"
+              ),
+              "topic": d["topic"],
+              "source_url": d["source_url"],
+              "fact_check_note": d["fact_check_note"],
+              "generated_at": d["generated_at"],
+              "privacy_status": "private",
+          }
+
+          Path("output/metadata.json").write_text(
+              json.dumps(metadata, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Generate neural voice
+        env:
+          VOICE_MODEL: ${{ steps.voice.outputs.model }}
         run: |
-          set -e
+          set -euo pipefail
 
-          python3 - <<'PYTHON'
+          .venv/bin/python -m piper \
+            -m "$VOICE_MODEL" \
+            -f output/voice.wav \
+            < output/narration.txt
+
+          test -s output/voice.wav
+
+      - name: Create vertical background
+        run: |
+          set -euo pipefail
+
+          python3 - <<'PY'
           from PIL import Image, ImageDraw
 
-          WIDTH, HEIGHT = 1080, 1920
-          image = Image.new("RGB", (WIDTH, HEIGHT))
+          width, height = 1080, 1920
+          image = Image.new("RGB", (width, height))
           draw = ImageDraw.Draw(image)
 
           top = (8, 15, 35)
           bottom = (65, 20, 90)
 
-          for y in range(HEIGHT):
-              ratio = y / (HEIGHT - 1)
+          for y in range(height):
+              ratio = y / (height - 1)
               color = tuple(
                   int(top[i] * (1 - ratio) + bottom[i] * ratio)
                   for i in range(3)
               )
-              draw.line((0, y, WIDTH, y), fill=color)
+              draw.line((0, y, width, y), fill=color)
 
           draw.ellipse((650, 180, 1280, 810), fill=(28, 48, 105))
           draw.ellipse((-260, 1080, 480, 1820), fill=(76, 24, 100))
           draw.ellipse((330, 650, 820, 1140), fill=(25, 35, 78))
 
           image.save("output/short.png")
-          print("Created background without text.")
-          PYTHON
+          PY
 
-      - name: Generate Russian neural voice
-        env:
-          VIDEO_SCRIPT: ${{ env.VIDEO_SCRIPT }}
-          PIPER_VOICE_MODEL: ${{ inputs.voice || 'ru_RU-irina-medium' }}
+      - name: Render MP4
         run: |
-          set -e
+          set -euo pipefail
 
-          if [ -z "$VIDEO_SCRIPT" ]; then
-            echo "Voiceover script is empty."
-            exit 1
-          fi
-
-          .venv/bin/python -m piper \
-            -m "$PIPER_VOICE_MODEL" \
-            -f output/voice.wav \
-            -- "$VIDEO_SCRIPT"
-
-          test -s output/voice.wav
-
-      - name: Render MP4 video
-        env:
-          VIDEO_DURATION: ${{ inputs.duration || '15' }}
-        run: |
-          set -e
-
-          DURATION="${VIDEO_DURATION:-15}"
-
-          case "$DURATION" in
+          case "$VIDEO_DURATION" in
             15|20|30) ;;
             *)
-              echo "Unsupported duration: $DURATION"
+              echo "Unsupported duration."
               exit 1
               ;;
           esac
@@ -213,7 +269,7 @@ jobs:
             -framerate 30 \
             -i output/short.png \
             -i output/voice.wav \
-            -t "$DURATION" \
+            -t "$VIDEO_DURATION" \
             -vf "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,format=yuv420p" \
             -af "apad" \
             -c:v libx264 \
@@ -226,39 +282,33 @@ jobs:
             -movflags +faststart \
             output/short.mp4
 
-      - name: Verify generated files
-        run: |
-          set -e
-
-          test -s output/short.png
-          test -s output/voice.wav
           test -s output/short.mp4
+
+      - name: Validate MP4
+        run: |
+          set -euo pipefail
+
+          python3 scripts/validate_video.py \
+            --file output/short.mp4 \
+            --expected-duration "$VIDEO_DURATION"
 
           ffprobe \
             -v error \
-            -show_entries format=duration,size,format_name \
-            -show_entries stream=codec_name,width,height,r_frame_rate \
+            -show_entries format=duration,size \
+            -show_entries stream=codec_name,width,height \
             -of default=noprint_wrappers=1 \
             output/short.mp4
 
-          ls -lh output/
-
-      - name: Run strict MP4 quality gate
-        env:
-          VIDEO_DURATION: ${{ inputs.duration || '15' }}
-        run: |
-          set -e
-          python3 scripts/validate_video.py \
-            --file output/short.mp4 \
-            --expected-duration "${VIDEO_DURATION:-15}"
-
-      - name: Upload generated video
+      - name: Upload generated video and script for review
         uses: actions/upload-artifact@v6
         with:
-          name: generated-text-free-short
+          name: generated-short-${{ env.TARGET_REGION }}
           path: |
             output/short.mp4
             output/short.png
             output/voice.wav
+            output/narration.txt
+            output/metadata.json
+            data/scripts/latest.json
           retention-days: 7
           if-no-files-found: error
