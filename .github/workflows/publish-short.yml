@@ -28,12 +28,12 @@ jobs:
         run: |
           if [ "$ENABLE_UPLOAD" != "true" ]; then
             echo "enabled=false" >> "$GITHUB_OUTPUT"
-            echo "Upload skipped. Enable it explicitly with repository variable ENABLE_YOUTUBE_UPLOAD=true."
+            echo "Upload skipped: ENABLE_YOUTUBE_UPLOAD is not true."
           elif [ -z "$YOUTUBE_CLIENT_ID" ] || \
                [ -z "$YOUTUBE_CLIENT_SECRET" ] || \
                [ -z "$YOUTUBE_REFRESH_TOKEN" ]; then
             echo "enabled=false" >> "$GITHUB_OUTPUT"
-            echo "Upload skipped. YouTube OAuth secrets are not fully configured."
+            echo "Upload skipped: YouTube OAuth secrets are missing."
           else
             echo "enabled=true" >> "$GITHUB_OUTPUT"
             echo "Upload settings are present."
@@ -67,6 +67,7 @@ jobs:
           python - <<'PY'
           import os
           from pathlib import Path
+          from datetime import datetime, timezone
 
           from google.auth.transport.requests import Request
           from google.oauth2.credentials import Credentials
@@ -74,8 +75,9 @@ jobs:
           from googleapiclient.http import MediaFileUpload
 
           video_path = Path("artifact/short.mp4")
+
           if not video_path.is_file() or video_path.stat().st_size == 0:
-              raise SystemExit("Upload failed: artifact/short.mp4 is missing or empty.")
+              raise SystemExit("Upload failed: video artifact is missing.")
 
           credentials = Credentials(
               token=None,
@@ -85,6 +87,7 @@ jobs:
               client_secret=os.environ["YOUTUBE_CLIENT_SECRET"],
               scopes=["https://www.googleapis.com/auth/youtube.upload"],
           )
+
           credentials.refresh(Request())
 
           youtube = build(
@@ -94,19 +97,23 @@ jobs:
               cache_discovery=False,
           )
 
-          from datetime import datetime, timezone
           timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
           request = youtube.videos().insert(
               part="snippet,status",
               body={
                   "snippet": {
-                      "title": f"Тестовый Shorts — {timestamp} #Shorts",
+                      "title": f"Интересный факт дня — {timestamp} #Shorts",
                       "description": (
-                          "Короткое видео на русском языке.\n"
-                          "#Shorts"
+                          "Короткий познавательный ролик на русском языке.\n"
+                          "Новый факт дня. #Shorts"
                       ),
-                      "tags": ["Shorts", "русский язык"],
+                      "tags": [
+                          "Shorts",
+                          "интересные факты",
+                          "познавательное видео",
+                          "русский язык",
+                      ],
                       "categoryId": "22",
                       "defaultLanguage": "ru",
                   },
@@ -133,4 +140,4 @@ jobs:
         if: steps.gate.outputs.enabled != 'true'
         run: |
           echo "No video was uploaded."
-          echo "Generation remains independent and unchanged."
+          echo "Generation completed independently."
