@@ -34,7 +34,7 @@ concurrency:
 
 jobs:
   generate:
-    name: Generate AI script and video
+    name: Generate AI script and topical video
     runs-on: ubuntu-24.04
     timeout-minutes: 25
 
@@ -80,23 +80,29 @@ jobs:
           .venv/bin/python -m pip install piper-tts
 
           ffmpeg -version
+          ffprobe -version
           .venv/bin/python -m piper --help
 
-      - name: Generate AI script from trends
+      - name: Find a trend with a usable topical video
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           TARGET_REGION: ${{ env.TARGET_REGION }}
-          GROQ_MODEL: openai/gpt-oss-20b
+          VIDEO_DURATION: ${{ env.VIDEO_DURATION }}
+          GROQ_MODEL: ${{ env.GROQ_MODEL }}
         run: |
           set -euo pipefail
 
-          python3 scripts/generate_ai_script.py
+          python3 scripts/find_trend_with_video.py
 
           test -s data/scripts/latest.json
+          test -s output/footage.mp4
+          test -s output/attribution.txt
+
           python3 -m json.tool data/scripts/latest.json >/dev/null
 
           python3 - <<'PY'
           import json
+          import os
           from pathlib import Path
 
           d = json.loads(
@@ -108,27 +114,33 @@ jobs:
               "RU": "Russian",
               "US": "English",
               "GB": "English",
-          }[d["region"]]
+          }
 
-          if d["region"] not in ("KZ", "RU", "US", "GB"):
-              raise SystemExit("Invalid script region.")
+          region = os.environ["TARGET_REGION"]
 
-          if d["region"] != __import__("os").environ["TARGET_REGION"]:
-              raise SystemExit("Script region does not match requested region.")
+          if d.get("region") != region:
+              raise SystemExit(
+                  "Script region does not match requested region."
+              )
 
-          if d["language"] != expected:
-              raise SystemExit("Script language does not match region.")
+          if d.get("language") != expected[region]:
+              raise SystemExit(
+                  "Script language does not match region."
+              )
 
-          for key in ("title", "hook", "narration", "fact_check_note"):
+          for key in (
+              "topic",
+              "title",
+              "hook",
+              "narration",
+              "fact_check_note",
+          ):
               if not isinstance(d.get(key), str) or not d[key].strip():
                   raise SystemExit(f"Missing script field: {key}")
 
-          print("AI script passed basic validation.")
-          print("Region:", d["region"])
-          print("Language:", d["language"])
+          print("Selected topic:", d["topic"])
           print("Title:", d["title"])
-          print("Word count:", d.get("word_count"))
-          print("Fact-check note:", d["fact_check_note"])
+          print("Language:", d["language"])
           PY
 
       - name: Select language and voice
@@ -163,7 +175,7 @@ jobs:
           test -s "$VOICE_MODEL.onnx"
           test -s "$VOICE_MODEL.onnx.json"
 
-      - name: Prepare narration text
+      - name: Prepare narration text and metadata
         run: |
           set -euo pipefail
           mkdir -p output
@@ -177,6 +189,7 @@ jobs:
           )
 
           narration = " ".join(d["narration"].split())
+
           if not narration:
               raise SystemExit("Narration is empty.")
 
@@ -185,14 +198,13 @@ jobs:
               encoding="utf-8",
           )
 
-          # Save title and description separately for later review/upload.
           metadata = {
               "region": d["region"],
               "language": d["language"],
               "title": d["title"],
               "description": (
-                  d["hook"] + "\n\n" +
-                  d["fact_check_note"] + "\n\n#Shorts"
+                  d["hook"] + "\n\n"
+                  + d["fact_check_note"] + "\n\n#Shorts"
               ),
               "topic": d["topic"],
               "source_url": d["source_url"],
@@ -220,36 +232,7 @@ jobs:
 
           test -s output/voice.wav
 
-      - name: Create vertical background
-        run: |
-          set -euo pipefail
-
-          python3 - <<'PY'
-          from PIL import Image, ImageDraw
-
-          width, height = 1080, 1920
-          image = Image.new("RGB", (width, height))
-          draw = ImageDraw.Draw(image)
-
-          top = (8, 15, 35)
-          bottom = (65, 20, 90)
-
-          for y in range(height):
-              ratio = y / (height - 1)
-              color = tuple(
-                  int(top[i] * (1 - ratio) + bottom[i] * ratio)
-                  for i in range(3)
-              )
-              draw.line((0, y, width, y), fill=color)
-
-          draw.ellipse((650, 180, 1280, 810), fill=(28, 48, 105))
-          draw.ellipse((-260, 1080, 480, 1820), fill=(76, 24, 100))
-          draw.ellipse((330, 650, 820, 1140), fill=(25, 35, 78))
-
-          image.save("output/short.png")
-          PY
-
-      - name: Render MP4
+      - name: Render MP4 with topical video
         run: |
           set -euo pipefail
 
@@ -261,16 +244,18 @@ jobs:
               ;;
           esac
 
+          test -s output/footage.mp4
+          test -s output/voice.wav
+
           ffmpeg \
             -hide_banner \
             -loglevel error \
             -y \
-            -loop 1 \
-            -framerate 30 \
-            -i output/short.png \
+            -stream_loop -1 \
+            -i output/footage.mp4 \
             -i output/voice.wav \
             -t "$VIDEO_DURATION" \
-            -vf "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,format=yuv420p" \
+            -vf "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,fps=30,format=yuv420p" \
             -af "apad" \
             -c:v libx264 \
             -preset ultrafast \
@@ -299,13 +284,14 @@ jobs:
             -of default=noprint_wrappers=1 \
             output/short.mp4
 
-      - name: Upload generated video and script for review
+      - name: Upload generated video, script and attribution
         uses: actions/upload-artifact@v6
         with:
           name: generated-short-${{ env.TARGET_REGION }}
           path: |
             output/short.mp4
-            output/short.png
+            output/footage.mp4
+            output/attribution.txt
             output/voice.wav
             output/narration.txt
             output/metadata.json
