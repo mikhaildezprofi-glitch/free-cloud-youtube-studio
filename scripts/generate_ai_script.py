@@ -96,7 +96,6 @@ def call_groq(api_key, model, prompt):
         "model": model,
         "temperature": 0.65,
         "max_tokens": 1100,
-        "response_format": {"type": "json_object"},
         "messages": [
             {
                 "role": "system",
