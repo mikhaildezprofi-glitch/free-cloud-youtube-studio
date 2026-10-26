@@ -1,0 +1,60 @@
+name: Discover Shorts Trends
+
+on:
+  schedule:
+    - cron: "15 5 * * *"
+  workflow_dispatch:
+    inputs:
+      regions:
+        description: "Trend regions: KZ,RU,US,GB"
+        required: true
+        default: "KZ,RU,US,GB"
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: discover-shorts-trends
+  cancel-in-progress: false
+
+jobs:
+  discover:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Collect and rank trend topics
+        env:
+          TREND_REGIONS: ${{ inputs.regions || 'KZ,RU,US,GB' }}
+        run: |
+          set -euo pipefail
+          python3 scripts/fetch_trends.py --regions "$TREND_REGIONS"
+          python3 -m json.tool data/trends/latest.json >/dev/null
+          python3 -m json.tool data/trends/history.json >/dev/null
+
+      - name: Upload trend report
+        uses: actions/upload-artifact@v6
+        with:
+          name: shorts-trend-report
+          path: |
+            data/trends/latest.json
+            data/trends/history.json
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Save report and history
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- data/trends/latest.json data/trends/history.json; then
+            echo "No changes to trend report/history."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/trends/latest.json data/trends/history.json
+          git commit -m "Update daily Shorts trend report"
+          git push
