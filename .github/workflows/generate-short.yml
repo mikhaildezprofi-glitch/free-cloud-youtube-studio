@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       language:
-        description: "Язык и регион видео"
+        description: "Язык видео"
         required: true
         type: choice
         options:
@@ -12,9 +12,8 @@ on:
           - RU
           - US
         default: KZ
-
       duration:
-        description: "Целевая длительность сценария в секундах"
+        description: "Целевая длительность в секундах"
         required: true
         type: choice
         options:
@@ -52,7 +51,7 @@ jobs:
           set -euo pipefail
 
           if [ -z "${GROQ_API_KEY:-}" ]; then
-            echo "::error::Missing GROQ_API_KEY secret."
+            echo "::error::Missing GROQ_API_KEY secret"
             exit 1
           fi
 
@@ -67,39 +66,52 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements.txt
 
-      - name: Cache pip packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: pip-${{ runner.os }}-python312-piper-v2
-          restore-keys: |
-            pip-${{ runner.os }}-python312-
-
-      - name: Install FFmpeg and Python dependencies
+      - name: Install FFmpeg only if missing
         run: |
           set -euo pipefail
 
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg
+          if command -v ffmpeg >/dev/null 2>&1 &&
+             command -v ffprobe >/dev/null 2>&1; then
+            echo "FFmpeg and ffprobe are already installed."
+            ffmpeg -version | head -n 1
+          else
+            echo "FFmpeg is missing; installing with a time limit."
+            timeout 4m sudo apt-get update
+            timeout 4m sudo apt-get install -y ffmpeg
+          fi
 
           command -v ffmpeg
           command -v ffprobe
 
+      - name: Install Piper with timeout
+        run: |
+          set -euo pipefail
+
           python -m venv .venv
 
-          .venv/bin/python -m pip install --upgrade pip
-          timeout 10m .venv/bin/python -m pip install --prefer-binary piper-tts
+          echo "Checking pip..."
+          timeout 2m .venv/bin/python -m pip --version
 
+          echo "Installing Piper TTS; this step is time-limited."
+          timeout 8m .venv/bin/python -m pip install \
+            --prefer-binary \
+            piper-tts
+
+          echo "Checking Piper installation..."
           .venv/bin/python -m piper --help >/dev/null
+
+          echo "Piper installation completed."
 
       - name: Cache Piper voice models
         uses: actions/cache@v4
         with:
           path: models
-          key: piper-voice-${{ runner.os }}-${{ inputs.language }}-v2
+          key: piper-voice-${{ runner.os }}-${{ inputs.language }}-v3
 
-      - name: Find trend, generate script and select initial footage
+      - name: Find trend and prepare initial footage
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GROQ_MODEL: openai/gpt-oss-20b
@@ -109,7 +121,9 @@ jobs:
         run: |
           set -euo pipefail
 
-          timeout 15m .venv/bin/python scripts/find_trend_with_video.py
+          echo "Starting trend and footage search..."
+          timeout 12m .venv/bin/python -u \
+            scripts/find_trend_with_video.py
 
           test -s output/footage.mp4
           test -s data/scripts/latest.json
@@ -123,15 +137,12 @@ jobs:
           )
 
           narration = str(data.get("narration", "")).strip()
-
           if not narration:
               raise SystemExit("ERROR: narration is missing")
 
           Path("output/script.txt").write_text(
-              narration + "\n",
-              encoding="utf-8"
+              narration + "\n", encoding="utf-8"
           )
-
           Path("output/metadata.json").write_text(
               json.dumps(data, ensure_ascii=False, indent=2) + "\n",
               encoding="utf-8"
@@ -174,29 +185,32 @@ jobs:
           CONFIG_URL: ${{ steps.voice.outputs.config_url }}
         run: |
           set -euo pipefail
+          mkdir -p models
 
-          if [ ! -s "$VOICE_MODEL" ] || [ ! -s "${VOICE_MODEL}.json" ]; then
-            mkdir -p models
+          if [ ! -s "$VOICE_MODEL" ] ||
+             [ ! -s "${VOICE_MODEL}.json" ]; then
+            echo "Downloading Piper voice model..."
+            timeout 5m curl --fail --location --retry 2 \
+              --connect-timeout 20 \
+              "$VOICE_URL" -o "$VOICE_MODEL"
 
-            curl --fail --location --retry 3 --connect-timeout 20 \
-              --max-time 300 "$VOICE_URL" -o "$VOICE_MODEL"
-
-            curl --fail --location --retry 3 --connect-timeout 20 \
-              --max-time 120 "$CONFIG_URL" -o "${VOICE_MODEL}.json"
+            timeout 2m curl --fail --location --retry 2 \
+              --connect-timeout 20 \
+              "$CONFIG_URL" -o "${VOICE_MODEL}.json"
           else
             echo "Using cached voice model."
           fi
 
           test -s "$VOICE_MODEL"
           test -s "${VOICE_MODEL}.json"
-
           echo "VOICE_MODEL=$VOICE_MODEL" >> "$GITHUB_ENV"
 
       - name: Generate neural narration
         run: |
           set -euo pipefail
 
-          timeout 5m .venv/bin/python -m piper \
+          echo "Generating narration..."
+          timeout 5m .venv/bin/python -u -m piper \
             --model "$VOICE_MODEL" \
             --config "${VOICE_MODEL}.json" \
             --input_file output/script.txt \
@@ -223,7 +237,8 @@ jobs:
           test -s output/footage.mp4
           test -s data/scripts/latest.json
 
-          timeout 15m .venv/bin/python scripts/ai_director.py
+          echo "Starting AI Director..."
+          timeout 12m .venv/bin/python -u scripts/ai_director.py
 
           test -s output/footage.mp4
           test -s output/director_plan.json
@@ -232,15 +247,12 @@ jobs:
         run: |
           set -euo pipefail
 
-          test -s output/footage.mp4
-          test -s output/narration.wav
-
           AUDIO_DURATION="$(ffprobe -v error \
             -show_entries format=duration \
             -of default=noprint_wrappers=1:nokey=1 \
             output/narration.wav)"
 
-          echo "Audio duration: ${AUDIO_DURATION} seconds"
+          echo "Rendering video for ${AUDIO_DURATION} seconds..."
 
           timeout 8m ffmpeg -hide_banner -y \
             -i output/footage.mp4 \
@@ -263,8 +275,6 @@ jobs:
             -show_entries format=duration \
             -of default=noprint_wrappers=1:nokey=1 \
             output/short.mp4)"
-
-          echo "Video duration: ${VIDEO_DURATION} seconds"
 
           .venv/bin/python - "$AUDIO_DURATION" "$VIDEO_DURATION" <<'PY'
           import sys
@@ -296,7 +306,9 @@ jobs:
           test -s output/director_plan.json
           test -s output/attribution.txt
 
-      - name: Upload generated video, script, director plan and attribution
+          echo "Final MP4 validation passed."
+
+      - name: Upload generated files
         if: always()
         uses: actions/upload-artifact@v4
         with:
