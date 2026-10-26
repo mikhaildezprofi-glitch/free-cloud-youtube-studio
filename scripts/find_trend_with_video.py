@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Find a trend, generate its script, and search multiple video providers."""
+"""Find a trend, generate its script, and locate reusable video footage."""
 
 import html
 import json
@@ -18,10 +18,11 @@ SCRIPT = ROOT / "data/scripts/latest.json"
 OUT = ROOT / "output"
 
 WIKIMEDIA_API = "https://commons.wikimedia.org/w/api.php"
-PEXELS_API = "https://api.pexels.com/videos/search"
 PIXABAY_API = "https://pixabay.com/api/videos/"
+ARCHIVE_SEARCH = "https://archive.org/advancedsearch.php"
+ARCHIVE_METADATA = "https://archive.org/metadata/"
 
-USER_AGENT = "FreeCloudYouTubeStudio/2.0"
+USER_AGENT = "FreeCloudYouTubeStudio/3.0"
 MAX_TRENDS = 10
 MAX_BYTES = 120 * 1024 * 1024
 TIMEOUT = 30
@@ -40,38 +41,14 @@ def request_json(url, headers=None, timeout=TIMEOUT):
         return json.loads(response.read().decode("utf-8"))
 
 
-def words(text):
-    return set(re.findall(r"[^\W_]{3,}", text.casefold(), re.UNICODE))
+def words(value):
+    return set(re.findall(r"[^\W_]{3,}", str(value).casefold(), re.UNICODE))
 
 
 def clean_text(value):
-    """Remove HTML markup from provider metadata."""
     value = html.unescape(str(value or ""))
     value = re.sub(r"<[^>]*>", " ", value)
     return re.sub(r"\s+", " ", value).strip()
-
-
-def license_is_allowed(name):
-    """Allow reusable licenses; reject noncommercial and no-derivatives."""
-    value = clean_text(name).casefold()
-    compact = value.replace(" ", "").replace("-", "")
-
-    if "noncommercial" in value or "non-commercial" in value:
-        return False
-    if "noderivatives" in value or "no derivatives" in value:
-        return False
-    if "ccby-nc" in value or "ccbync" in compact:
-        return False
-    if "ccby-nd" in value or "ccbynd" in compact:
-        return False
-
-    return (
-        "cc0" in value
-        or "public domain" in value
-        or "cc by-sa" in value
-        or "cc by " in value
-        or value.strip() == "cc by"
-    )
 
 
 def api_query(base_url, params, headers=None):
@@ -79,30 +56,51 @@ def api_query(base_url, params, headers=None):
     return request_json(url, headers=headers)
 
 
-def search_wikimedia(topic, title):
-    """Search Commons for videos with an acceptable reuse license."""
-    query = f"{topic} {title}".strip()
-    response = api_query(
-        WIKIMEDIA_API,
-        {
-            "action": "query",
-            "format": "json",
-            "generator": "search",
-            "gsrsearch": query + " filetype:video",
-            "gsrnamespace": "6",
-            "gsrlimit": "20",
-            "prop": "imageinfo",
-            "iiprop": "url|size|mime|extmetadata",
-        },
+def license_is_allowed(name):
+    """Conservative allowlist for explicitly reusable licenses."""
+    value = clean_text(name).casefold()
+    compact = re.sub(r"[\s_-]+", "", value)
+
+    if any(term in value for term in (
+        "noncommercial", "non-commercial", "no derivatives",
+        "noderivatives", "all rights reserved", "copyright",
+    )):
+        return False
+
+    if any(term in compact for term in (
+        "ccbync", "ccbynd", "ccbyncnd", "ccbyncsa",
+    )):
+        return False
+
+    return (
+        "cc0" in compact
+        or "public domain" in value
+        or "publicdomain" in compact
+        or "cc by-sa" in value
+        or "cc by " in value
+        or value.strip() == "cc by"
+        or compact in {"creativecommonsattribution", "ccby"}
     )
+
+
+def search_wikimedia(topic, title):
+    query = f"{topic} {title}".strip()
+    response = api_query(WIKIMEDIA_API, {
+        "action": "query",
+        "format": "json",
+        "generator": "search",
+        "gsrsearch": query + " filetype:video",
+        "gsrnamespace": 6,
+        "gsrlimit": 30,
+        "prop": "imageinfo",
+        "iiprop": "url|size|mime|extmetadata",
+    })
 
     wanted = words(query)
-    pages = list(
-        (response.get("query", {}).get("pages", {}) or {}).values()
-    )
     matches = []
 
-    for page in pages:
+    pages = response.get("query", {}).get("pages", {}) or {}
+    for page in pages.values():
         images = page.get("imageinfo", [])
         if not images:
             continue
@@ -113,218 +111,217 @@ def search_wikimedia(topic, title):
 
         if not media_url.startswith("https://"):
             continue
-
         if mime not in ("video/webm", "video/ogg", "video/mp4"):
-            if not media_url.lower().endswith(
-                (".webm", ".ogv", ".ogg", ".mp4")
-            ):
+            if not media_url.lower().endswith((".webm", ".ogv", ".ogg", ".mp4")):
                 continue
 
-        metadata = info.get("extmetadata", {})
+        metadata = info.get("extmetadata", {}) or {}
         license_name = clean_text(
-            metadata.get("LicenseShortName", {}).get("value", "")
+            (metadata.get("LicenseShortName") or {}).get("value", "")
         )
-
         if not license_is_allowed(license_name):
             continue
 
-        filename = page.get("title", "").replace("File:", "")
+        filename = page.get("title", "").removeprefix("File:")
         overlap = wanted & words(filename)
-
         if not overlap:
             continue
         if len(wanted) >= 3 and len(overlap) < 2:
             continue
 
-        score = len(overlap) / max(1, len(wanted))
         source_page = (
             "https://commons.wikimedia.org/wiki/"
             + urllib.parse.quote(page.get("title", "").replace(" ", "_"))
         )
-
-        matches.append(
-            (
-                score,
-                {
-                    "provider": "Wikimedia Commons",
-                    "download_url": media_url,
-                    "page_url": source_page,
-                    "creator": clean_text(
-                        metadata.get("Artist", {}).get(
-                            "value", "Not specified"
-                        )
-                    ),
-                    "license": license_name,
-                    "license_url": clean_text(
-                        metadata.get("LicenseUrl", {}).get("value", "")
-                    ),
-                    "filename": filename,
-                    "size": info.get("size", 0),
-                },
-            )
-        )
+        matches.append((
+            len(overlap) / max(1, len(wanted)),
+            {
+                "provider": "Wikimedia Commons",
+                "download_url": media_url,
+                "page_url": source_page,
+                "creator": clean_text(
+                    (metadata.get("Artist") or {}).get("value", "Not specified")
+                ),
+                "license": license_name,
+                "license_url": clean_text(
+                    (metadata.get("LicenseUrl") or {}).get("value", "")
+                ),
+                "filename": filename,
+                "size": int(info.get("size") or 0),
+            },
+        ))
 
     matches.sort(key=lambda item: item[0], reverse=True)
     return matches[0][1] if matches and matches[0][0] >= 0.15 else None
 
 
-def search_pexels(topic, title):
-    """Pexels requires PEXELS_API_KEY in GitHub Actions secrets."""
-    api_key = os.getenv("PEXELS_API_KEY", "").strip()
-    if not api_key:
-        log("  Pexels: API key not configured; skipping.")
-        return None
-
-    query = f"{topic} {title}".strip()
-    response = api_query(
-        PEXELS_API,
-        {
-            "query": query,
-            "per_page": 15,
-            "orientation": "portrait",
-        },
-        headers={"Authorization": api_key},
-    )
-
-    wanted = words(query)
-    matches = []
-
-    for video in response.get("videos", []):
-        page_url = video.get("url", "")
-        user = video.get("user", {}) or {}
-        video_files = video.get("video_files", [])
-
-        candidates = [
-            item for item in video_files
-            if item.get("link", "").startswith("https://")
-        ]
-        if not candidates:
-            continue
-
-        # Prefer a reasonably high resolution without choosing huge files.
-        candidates.sort(
-            key=lambda item: (
-                abs(int(item.get("width") or 720) - 1080),
-                -int(item.get("height") or 0),
-            )
-        )
-        chosen = candidates[0]
-
-        searchable = " ".join(
-            [query, page_url, str(video.get("id", ""))]
-        )
-        overlap = wanted & words(searchable)
-        score = len(overlap) / max(1, len(wanted))
-
-        # Search results are query-filtered by Pexels. Keep relevant matches.
-        if score < 0.10:
-            continue
-
-        matches.append(
-            (
-                score,
-                {
-                    "provider": "Pexels",
-                    "download_url": chosen["link"],
-                    "page_url": page_url,
-                    "creator": user.get("name", "Not specified"),
-                    "license": "Pexels License",
-                    "license_url": "https://www.pexels.com/license/",
-                    "filename": f"Pexels video {video.get('id', '')}",
-                    "size": 0,
-                },
-            )
-        )
-
-    matches.sort(key=lambda item: item[0], reverse=True)
-    return matches[0][1] if matches else None
-
-
 def search_pixabay(topic, title):
-    """Pixabay requires PIXABAY_API_KEY in GitHub Actions secrets."""
     api_key = os.getenv("PIXABAY_API_KEY", "").strip()
     if not api_key:
-        log("  Pixabay: API key not configured; skipping.")
+        log("  Pixabay: PIXABAY_API_KEY not configured; skipping.")
         return None
 
     query = f"{topic} {title}".strip()
-    response = api_query(
-        PIXABAY_API,
-        {
-            "key": api_key,
-            "q": query,
-            "per_page": 15,
-            "safesearch": "true",
-            "video_type": "all",
-        },
-    )
+    response = api_query(PIXABAY_API, {
+        "key": api_key,
+        "q": query,
+        "per_page": 20,
+        "safesearch": "true",
+        "video_type": "all",
+    })
 
     wanted = words(query)
     matches = []
 
     for video in response.get("hits", []):
-        video_sets = video.get("videos", {}) or {}
-        candidates = []
+        sets = video.get("videos", {}) or {}
+        chosen = None
 
-        for size_name in ("large", "medium", "small", "tiny"):
-            item = video_sets.get(size_name, {}) or {}
-            if item.get("url", "").startswith("https://"):
-                candidates.append((size_name, item))
+        for size_name in ("medium", "large", "small", "tiny"):
+            candidate = sets.get(size_name, {}) or {}
+            if candidate.get("url", "").startswith("https://"):
+                chosen = candidate
+                break
 
-        if not candidates:
+        if not chosen:
             continue
 
-        # Prefer medium/large, but accept smaller files if necessary.
-        chosen = next(
-            (item for name, item in candidates if name == "medium"),
-            candidates[0][1],
-        )
-        page_url = video.get("pageURL", "")
         tags = clean_text(video.get("tags", ""))
-        overlap = wanted & words(query + " " + tags)
-        score = len(overlap) / max(1, len(wanted))
+        searchable = words(tags)
+        overlap = wanted & searchable
 
-        if score < 0.10:
+        # Do not score the query against itself; require tag relevance.
+        if not overlap:
             continue
 
-        matches.append(
-            (
-                score,
-                {
-                    "provider": "Pixabay",
-                    "download_url": chosen["url"],
-                    "page_url": page_url,
-                    "creator": video.get("user", "Not specified"),
-                    "license": "Pixabay Content License",
-                    "license_url": "https://pixabay.com/service/license-summary/",
-                    "filename": f"Pixabay video {video.get('id', '')}",
-                    "size": 0,
-                },
+        matches.append((
+            len(overlap) / max(1, len(wanted)),
+            {
+                "provider": "Pixabay",
+                "download_url": chosen["url"],
+                "page_url": video.get("pageURL", ""),
+                "creator": video.get("user", "Not specified"),
+                "license": "Pixabay Content License",
+                "license_url": "https://pixabay.com/service/license-summary/",
+                "filename": f"Pixabay video {video.get('id', '')}",
+                "size": 0,
+            },
+        ))
+
+    matches.sort(key=lambda item: item[0], reverse=True)
+    return matches[0][1] if matches else None
+
+
+def search_internet_archive(topic, title):
+    """Use Archive.org only when item metadata explicitly indicates reuse."""
+    query = f"{topic} {title}".strip()
+    response = api_query(ARCHIVE_SEARCH, {
+        "q": f'({query}) AND mediatype:movies',
+        "fl[]": ["identifier", "title"],
+        "rows": 10,
+        "output": "json",
+    })
+
+    docs = response.get("response", {}).get("docs", []) or []
+    wanted = words(query)
+    matches = []
+
+    for doc in docs:
+        identifier = str(doc.get("identifier", "")).strip()
+        if not identifier:
+            continue
+
+        try:
+            metadata = request_json(
+                ARCHIVE_METADATA + urllib.parse.quote(identifier, safe="")
+            )
+        except Exception as error:
+            log(f"  Internet Archive metadata skipped: {error}")
+            continue
+
+        item_meta = metadata.get("metadata", {}) or {}
+        rights = clean_text(
+            item_meta.get("licenseurl")
+            or item_meta.get("rights")
+            or item_meta.get("license")
+            or ""
+        )
+
+        # Archive.org is not itself a license. Require explicit reuse terms.
+        if not license_is_allowed(rights):
+            continue
+
+        files = metadata.get("files", []) or []
+        video_files = [
+            f for f in files
+            if str(f.get("name", "")).lower().endswith(
+                (".mp4", ".webm", ".ogv", ".mov")
+            )
+            and not f.get("private")
+        ]
+        if not video_files:
+            continue
+
+        video_files.sort(
+            key=lambda f: (
+                0 if f.get("name", "").lower().endswith(".mp4") else 1,
+                int(f.get("size") or 0),
             )
         )
+        chosen = next(
+            (f for f in video_files if int(f.get("size") or 0) <= MAX_BYTES),
+            None,
+        )
+        if not chosen:
+            continue
+
+        identifier_words = words(doc.get("title", "") + " " + identifier)
+        overlap = wanted & identifier_words
+        if not overlap:
+            continue
+
+        file_url = (
+            "https://archive.org/download/"
+            + urllib.parse.quote(identifier, safe="")
+            + "/"
+            + urllib.parse.quote(chosen["name"], safe="/")
+        )
+
+        matches.append((
+            len(overlap) / max(1, len(wanted)),
+            {
+                "provider": "Internet Archive",
+                "download_url": file_url,
+                "page_url": "https://archive.org/details/" + identifier,
+                "creator": clean_text(item_meta.get("creator", "Not specified")),
+                "license": rights,
+                "license_url": rights if rights.startswith("https://") else "",
+                "filename": chosen["name"],
+                "size": int(chosen.get("size") or 0),
+            },
+        ))
 
     matches.sort(key=lambda item: item[0], reverse=True)
     return matches[0][1] if matches else None
 
 
 def search_video(topic, title):
-    """Try each configured provider; continue if one fails."""
     providers = [
         ("Wikimedia Commons", search_wikimedia),
-        ("Pexels", search_pexels),
         ("Pixabay", search_pixabay),
+        ("Internet Archive", search_internet_archive),
     ]
 
-    for provider_name, search_function in providers:
+    for name, search_function in providers:
         try:
-            log(f"  Searching {provider_name}...")
+            log(f"  Searching {name}...")
             result = search_function(topic, title)
             if result:
-                log(f"  Found a candidate on {provider_name}.")
+                log(f"  Found a candidate on {name}.")
                 return result
-            log(f"  No suitable candidate on {provider_name}.")
+            log(f"  No suitable candidate on {name}.")
         except Exception as error:
-            log(f"  {provider_name} search failed: {error}")
+            log(f"  {name} search failed: {type(error).__name__}: {error}")
 
     return None
 
@@ -333,9 +330,7 @@ def download_video(url, destination, expected_size=0):
     if expected_size and int(expected_size) > MAX_BYTES:
         raise ValueError("Video exceeds the 120 MB limit.")
 
-    request = urllib.request.Request(
-        url, headers={"User-Agent": USER_AGENT}
-    )
+    request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     total = 0
 
     with urllib.request.urlopen(request, timeout=60) as response:
@@ -348,7 +343,6 @@ def download_video(url, destination, expected_size=0):
                 total += len(chunk)
                 if total > MAX_BYTES:
                     raise ValueError("Download exceeded the 120 MB limit.")
-
                 output.write(chunk)
 
     if total < 100_000:
@@ -357,11 +351,10 @@ def download_video(url, destination, expected_size=0):
 
 def generate_script(candidate, region, original_report):
     topic = str(candidate.get("topic", "")).strip()
-    isolated = (
-        dict(original_report) if isinstance(original_report, dict) else {}
-    )
+    isolated = dict(original_report) if isinstance(original_report, dict) else {}
     isolated["shortlist"] = [candidate]
     isolated["candidates"] = [candidate]
+
     TRENDS.write_text(
         json.dumps(isolated, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
@@ -371,10 +364,7 @@ def generate_script(candidate, region, original_report):
     env["TARGET_REGION"] = region
 
     result = subprocess.run(
-        [
-            sys.executable,
-            str(ROOT / "scripts/generate_ai_script.py"),
-        ],
+        [sys.executable, str(ROOT / "scripts/generate_ai_script.py")],
         cwd=ROOT,
         env=env,
         capture_output=True,
@@ -385,9 +375,9 @@ def generate_script(candidate, region, original_report):
     if result.returncode != 0:
         log("  Script generation failed.")
         if result.stdout.strip():
-            log("  STDOUT: " + result.stdout.strip()[-3000:])
+            log("  STDOUT: " + result.stdout.strip()[-2500:])
         if result.stderr.strip():
-            log("  STDERR: " + result.stderr.strip()[-3000:])
+            log("  STDERR: " + result.stderr.strip()[-2500:])
         return None
 
     try:
@@ -397,9 +387,8 @@ def generate_script(candidate, region, original_report):
         return None
 
     if str(data.get("topic", "")).strip().casefold() != topic.casefold():
-        log("  Generated script topic does not match the selected trend.")
+        log("  Generated script topic does not match selected trend.")
         return None
-
     if not str(data.get("narration", "")).strip():
         log("  Generated script has no narration.")
         return None
@@ -407,18 +396,14 @@ def generate_script(candidate, region, original_report):
     return data
 
 
-def prepare_footage(video, topic, title, duration):
+def prepare_footage(video, duration):
     temporary = OUT / "source_clip.download"
     footage = OUT / "footage.mp4"
     temporary.unlink(missing_ok=True)
     footage.unlink(missing_ok=True)
 
     try:
-        download_video(
-            video["download_url"],
-            temporary,
-            video.get("size", 0),
-        )
+        download_video(video["download_url"], temporary, video.get("size", 0))
 
         probe = subprocess.run(
             [
@@ -431,10 +416,8 @@ def prepare_footage(video, topic, title, duration):
             text=True,
             timeout=30,
         )
-
         if probe.returncode != 0 or not probe.stdout.strip():
             raise ValueError("ffprobe could not read the downloaded video.")
-
         if float(probe.stdout.strip()) < 2:
             raise ValueError("Source clip is shorter than two seconds.")
 
@@ -447,8 +430,7 @@ def prepare_footage(video, topic, title, duration):
                 "scale=1080:1920:force_original_aspect_ratio=increase,"
                 "crop=1080:1920,fps=30,format=yuv420p",
                 "-an", "-c:v", "libx264", "-preset", "ultrafast",
-                "-crf", "25", "-movflags", "+faststart",
-                str(footage),
+                "-crf", "25", "-movflags", "+faststart", str(footage),
             ],
             capture_output=True,
             text=True,
@@ -465,12 +447,6 @@ def prepare_footage(video, topic, title, duration):
             )
 
         return footage
-
-    except Exception:
-        temporary.unlink(missing_ok=True)
-        footage.unlink(missing_ok=True)
-        raise
-
     finally:
         temporary.unlink(missing_ok=True)
 
@@ -517,7 +493,6 @@ def main():
 
     if duration not in {"15", "30", "45", "60"}:
         raise RuntimeError("VIDEO_DURATION must be 15, 30, 45 or 60.")
-
     if not os.getenv("GROQ_API_KEY", "").strip():
         raise RuntimeError("Missing GROQ_API_KEY secret.")
 
@@ -559,9 +534,7 @@ def main():
     filtered = filtered[:MAX_TRENDS]
 
     if not filtered:
-        raise RuntimeError(
-            f"No trends available for region {region}."
-        )
+        raise RuntimeError(f"No trends available for region {region}.")
 
     OUT.mkdir(parents=True, exist_ok=True)
     failures = []
@@ -576,44 +549,26 @@ def main():
                 failures.append(f"{topic}: script generation failed")
                 continue
 
-            try:
-                video = search_video(
-                    topic,
-                    str(script_data.get("title", "")),
-                )
-            except Exception as error:
-                log(f"  Video search failed: {error}")
-                video = None
-
+            video = search_video(topic, str(script_data.get("title", "")))
             if not video:
-                log("  No suitable video found in configured providers.")
                 failures.append(f"{topic}: no usable video")
                 continue
 
             try:
-                prepare_footage(
-                    video,
-                    topic,
-                    str(script_data.get("title", "")),
-                    duration,
-                )
+                prepare_footage(video, duration)
             except Exception as error:
                 log(f"  Could not prepare selected video: {error}")
                 failures.append(f"{topic}: video processing failed")
                 continue
 
             write_attribution(topic, script_data, video, number)
-            log(
-                f"SUCCESS: prepared video for '{topic}' "
-                f"using {video.get('provider')}."
-            )
+            log(f"SUCCESS: prepared video for '{topic}' using {video['provider']}.")
             return
-
     finally:
         TRENDS.write_text(original_text, encoding="utf-8")
 
     raise RuntimeError(
-        f"No usable video found for the first {len(filtered)} trends. "
+        f"No usable video found in the first {len(filtered)} trends. "
         + "; ".join(failures)
     )
 
@@ -623,69 +578,4 @@ if __name__ == "__main__":
         main()
     except Exception as error:
         log(f"FATAL: {type(error).__name__}: {error}")
-        raisey.unlink(missing_ok=True)
-
-            license_name = (
-                metadata.get("LicenseShortName", {}).get("value", "")
-            )
-            license_url = metadata.get("LicenseUrl", {}).get("value", "")
-            creator = metadata.get("Artist", {}).get(
-                "value", "Автор не указан"
-            )
-            source_page = (
-                "https://commons.wikimedia.org/wiki/"
-                + urllib.parse.quote(
-                    page.get("title", "").replace(" ", "_")
-                )
-            )
-
-            (OUT / "attribution.txt").write_text(
-                f"Тренд: {topic}\n"
-                f"Заголовок: {script_data.get('title', '')}\n"
-                f"Файл: {page.get('title', '')}\n"
-                f"Автор: {creator}\n"
-                f"Лицензия: {license_name}\n"
-                f"Лицензия URL: {license_url}\n"
-                f"Источник: {source_page}\n",
-                encoding="utf-8",
-            )
-
-            metadata_file = OUT / "metadata.json"
-            video_metadata = {}
-            if metadata_file.exists():
-                try:
-                    video_metadata = json.loads(
-                        metadata_file.read_text(encoding="utf-8")
-                    )
-                except json.JSONDecodeError:
-                    pass
-
-            video_metadata.update({
-                "topic": topic,
-                "visual_source": source_page,
-                "visual_license": license_name,
-                "visual_creator": creator,
-                "visual_license_url": license_url,
-                "visual_search_attempt": number,
-            })
-
-            metadata_file.write_text(
-                json.dumps(video_metadata, ensure_ascii=False, indent=2)
-                + "\n",
-                encoding="utf-8",
-            )
-
-            log(f"УСПЕХ: найден видеоряд для темы «{topic}»")
-            return
-
-    finally:
-        TRENDS.write_text(original_report, encoding="utf-8")
-
-    raise RuntimeError(
-        "Не найдено подходящего видео для первых "
-        f"{len(filtered)} трендов. " + "; ".join(failures)
-    )
-
-
-if __name__ == "__main__":
-    main()
+        raise
