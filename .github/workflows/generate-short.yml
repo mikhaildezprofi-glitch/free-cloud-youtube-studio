@@ -11,7 +11,8 @@ on:
           - KZ
           - RU
           - US
-        default: KZ
+          - GB
+        default: RU
       duration:
         description: "Целевая длительность в секундах"
         required: true
@@ -34,7 +35,7 @@ jobs:
   generate:
     name: Generate and validate Short
     runs-on: ubuntu-24.04
-    timeout-minutes: 40
+    timeout-minutes: 45
 
     env:
       PYTHONUNBUFFERED: "1"
@@ -70,37 +71,38 @@ jobs:
           cache-dependency-path: requirements.txt
 
       - name: Install FFmpeg only if missing
+        timeout-minutes: 12
         run: |
           set -euo pipefail
 
           if command -v ffmpeg >/dev/null 2>&1 &&
              command -v ffprobe >/dev/null 2>&1; then
             echo "FFmpeg and ffprobe are already installed."
-            ffmpeg -version | head -n 1
           else
-            echo "FFmpeg is missing; installing with a time limit."
-            timeout 4m sudo apt-get update
-            timeout 4m sudo apt-get install -y ffmpeg
+            echo "Installing FFmpeg without recommended packages."
+
+            sudo apt-get update \
+              -o Acquire::Retries=2
+
+            sudo apt-get install -y --no-install-recommends ffmpeg
           fi
 
           command -v ffmpeg
           command -v ffprobe
+          ffmpeg -version | head -n 1
+          ffprobe -version | head -n 1
 
       - name: Install Piper with timeout
+        timeout-minutes: 12
         run: |
           set -euo pipefail
 
           python -m venv .venv
 
-          echo "Checking pip..."
-          timeout 2m .venv/bin/python -m pip --version
-
-          echo "Installing Piper TTS; this step is time-limited."
-          timeout 8m .venv/bin/python -m pip install \
+          .venv/bin/python -m pip install \
             --prefer-binary \
             piper-tts
 
-          echo "Checking Piper installation..."
           .venv/bin/python -m piper --help >/dev/null
 
           echo "Piper installation completed."
@@ -109,9 +111,10 @@ jobs:
         uses: actions/cache@v4
         with:
           path: models
-          key: piper-voice-${{ runner.os }}-${{ inputs.language }}-v3
+          key: piper-voice-${{ runner.os }}-${{ inputs.language }}-v4
 
       - name: Find trend and prepare initial footage
+        timeout-minutes: 15
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GROQ_MODEL: openai/gpt-oss-20b
@@ -122,8 +125,8 @@ jobs:
           set -euo pipefail
 
           echo "Starting trend and footage search..."
-          timeout 12m .venv/bin/python -u \
-            scripts/find_trend_with_video.py
+
+          .venv/bin/python -u scripts/find_trend_with_video.py
 
           test -s output/footage.mp4
           test -s data/scripts/latest.json
@@ -143,6 +146,7 @@ jobs:
           Path("output/script.txt").write_text(
               narration + "\n", encoding="utf-8"
           )
+
           Path("output/metadata.json").write_text(
               json.dumps(data, ensure_ascii=False, indent=2) + "\n",
               encoding="utf-8"
@@ -167,7 +171,7 @@ jobs:
               echo "url=https://huggingface.co/rhasspy/piper-voices/resolve/main/ru/ru_RU/irina/medium/ru_RU-irina-medium.onnx" >> "$GITHUB_OUTPUT"
               echo "config_url=https://huggingface.co/rhasspy/piper-voices/resolve/main/ru/ru_RU/irina/medium/ru_RU-irina-medium.onnx.json" >> "$GITHUB_OUTPUT"
               ;;
-            US)
+            US|GB)
               echo "model=models/en_US-lessac-medium.onnx" >> "$GITHUB_OUTPUT"
               echo "url=https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx" >> "$GITHUB_OUTPUT"
               echo "config_url=https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx.json" >> "$GITHUB_OUTPUT"
@@ -179,6 +183,7 @@ jobs:
           esac
 
       - name: Download voice model if not cached
+        timeout-minutes: 8
         env:
           VOICE_MODEL: ${{ steps.voice.outputs.model }}
           VOICE_URL: ${{ steps.voice.outputs.url }}
@@ -189,12 +194,14 @@ jobs:
 
           if [ ! -s "$VOICE_MODEL" ] ||
              [ ! -s "${VOICE_MODEL}.json" ]; then
+
             echo "Downloading Piper voice model..."
-            timeout 5m curl --fail --location --retry 2 \
+
+            curl --fail --location --retry 2 \
               --connect-timeout 20 \
               "$VOICE_URL" -o "$VOICE_MODEL"
 
-            timeout 2m curl --fail --location --retry 2 \
+            curl --fail --location --retry 2 \
               --connect-timeout 20 \
               "$CONFIG_URL" -o "${VOICE_MODEL}.json"
           else
@@ -203,14 +210,15 @@ jobs:
 
           test -s "$VOICE_MODEL"
           test -s "${VOICE_MODEL}.json"
+
           echo "VOICE_MODEL=$VOICE_MODEL" >> "$GITHUB_ENV"
 
       - name: Generate neural narration
+        timeout-minutes: 7
         run: |
           set -euo pipefail
 
-          echo "Generating narration..."
-          timeout 5m .venv/bin/python -u -m piper \
+          .venv/bin/python -u -m piper \
             --model "$VOICE_MODEL" \
             --config "${VOICE_MODEL}.json" \
             --input_file output/script.txt \
@@ -226,6 +234,7 @@ jobs:
           echo "Narration duration: ${AUDIO_DURATION} seconds"
 
       - name: AI Director - plan and assemble scenes
+        timeout-minutes: 15
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GROQ_MODEL: openai/gpt-oss-20b
@@ -238,12 +247,14 @@ jobs:
           test -s data/scripts/latest.json
 
           echo "Starting AI Director..."
-          timeout 12m .venv/bin/python -u scripts/ai_director.py
+
+          .venv/bin/python -u scripts/ai_director.py
 
           test -s output/footage.mp4
           test -s output/director_plan.json
 
       - name: Render MP4 synchronized to narration
+        timeout-minutes: 10
         run: |
           set -euo pipefail
 
@@ -254,7 +265,7 @@ jobs:
 
           echo "Rendering video for ${AUDIO_DURATION} seconds..."
 
-          timeout 8m ffmpeg -hide_banner -y \
+          ffmpeg -hide_banner -y \
             -i output/footage.mp4 \
             -i output/narration.wav \
             -map 0:v:0 \
@@ -294,6 +305,7 @@ jobs:
           PY
 
       - name: Validate final MP4
+        timeout-minutes: 5
         run: |
           set -euo pipefail
 
