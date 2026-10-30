@@ -14,7 +14,7 @@ jobs:
   publish:
     name: Upload generated Short privately
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
 
     steps:
@@ -26,14 +26,16 @@ jobs:
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
           YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
         run: |
+          set -euo pipefail
+
           if [ "$ENABLE_UPLOAD" != "true" ]; then
             echo "enabled=false" >> "$GITHUB_OUTPUT"
-            echo "Upload skipped: ENABLE_YOUTUBE_UPLOAD is not true."
-          elif [ -z "$YOUTUBE_CLIENT_ID" ] || \
-               [ -z "$YOUTUBE_CLIENT_SECRET" ] || \
+            echo "Upload disabled. No video will be published."
+          elif [ -z "$YOUTUBE_CLIENT_ID" ] ||
+               [ -z "$YOUTUBE_CLIENT_SECRET" ] ||
                [ -z "$YOUTUBE_REFRESH_TOKEN" ]; then
             echo "enabled=false" >> "$GITHUB_OUTPUT"
-            echo "Upload skipped: YouTube OAuth secrets are missing."
+            echo "YouTube OAuth secrets are missing."
           else
             echo "enabled=true" >> "$GITHUB_OUTPUT"
             echo "Upload settings are present."
@@ -43,7 +45,8 @@ jobs:
         if: steps.gate.outputs.enabled == 'true'
         uses: actions/download-artifact@v4
         with:
-          name: generated-text-free-short
+          pattern: youtube-short-*
+          merge-multiple: true
           path: artifact
           github-token: ${{ github.token }}
           repository: ${{ github.repository }}
@@ -52,7 +55,7 @@ jobs:
       - name: Install YouTube API libraries
         if: steps.gate.outputs.enabled == 'true'
         run: |
-          python -m pip install --upgrade \
+          python -m pip install \
             google-api-python-client \
             google-auth \
             google-auth-httplib2
@@ -64,20 +67,55 @@ jobs:
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
           YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
         run: |
+          set -euo pipefail
+
           python - <<'PY'
+          import json
           import os
           from pathlib import Path
-          from datetime import datetime, timezone
 
           from google.auth.transport.requests import Request
           from google.oauth2.credentials import Credentials
           from googleapiclient.discovery import build
           from googleapiclient.http import MediaFileUpload
 
-          video_path = Path("artifact/short.mp4")
+          video_path = Path("artifact/output/short.mp4")
+          metadata_path = Path("artifact/output/metadata.json")
 
           if not video_path.is_file() or video_path.stat().st_size == 0:
-              raise SystemExit("Upload failed: video artifact is missing.")
+              raise SystemExit("Upload failed: artifact/output/short.mp4 is missing.")
+
+          metadata = {}
+          if metadata_path.is_file():
+              try:
+                  metadata = json.loads(
+                      metadata_path.read_text(encoding="utf-8")
+                  )
+              except (ValueError, OSError):
+                  print("Warning: metadata could not be read; using fallback.")
+
+          title = str(
+              metadata.get("title") or "Interesting fact of the day"
+          ).strip()
+
+          narration = str(metadata.get("narration") or "").strip()
+          topic = str(metadata.get("topic") or "").strip()
+          language = str(metadata.get("language") or "en").lower()
+
+          description_parts = []
+          if topic:
+              description_parts.append(f"Topic: {topic}")
+          if narration:
+              description_parts.append(narration)
+
+          description_parts.append("#Shorts")
+          description = "\n\n".join(description_parts)
+
+          if len(title) > 100:
+              title = title[:97] + "..."
+
+          if len(description) > 5000:
+              description = description[:4990] + "..."
 
           credentials = Credentials(
               token=None,
@@ -97,25 +135,17 @@ jobs:
               cache_discovery=False,
           )
 
-          timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+          default_language = "ru" if language in ("ru", "kz") else "en"
 
           request = youtube.videos().insert(
               part="snippet,status",
               body={
                   "snippet": {
-                      "title": f"Интересный факт дня — {timestamp} #Shorts",
-                      "description": (
-                          "Короткий познавательный ролик на русском языке.\n"
-                          "Новый факт дня. #Shorts"
-                      ),
-                      "tags": [
-                          "Shorts",
-                          "интересные факты",
-                          "познавательное видео",
-                          "русский язык",
-                      ],
-                      "categoryId": "22",
-                      "defaultLanguage": "ru",
+                      "title": title,
+                      "description": description,
+                      "tags": ["Shorts", "facts", "education"],
+                      "categoryId": "27",
+                      "defaultLanguage": default_language,
                   },
                   "status": {
                       "privacyStatus": "private",
@@ -140,4 +170,4 @@ jobs:
         if: steps.gate.outputs.enabled != 'true'
         run: |
           echo "No video was uploaded."
-          echo "Generation completed independently."
+          echo "Upload is disabled or OAuth settings are incomplete."
