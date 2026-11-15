@@ -1,322 +1,315 @@
 {
-  "updated_at": "2026-11-14T05:55:36Z",
+  "updated_at": "2026-11-15T05:57:44Z",
   "topics": {
-    "китай": {
-      "topic": "китай",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "кокшетау": {
+      "topic": "кокшетау",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "KZ"
       ]
     },
-    "транспорт": {
-      "topic": "транспорт",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "самолет": {
+      "topic": "самолет",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "KZ"
       ]
     },
-    "эрик базинян": {
-      "topic": "эрик базинян",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "мәлімдеме": {
+      "topic": "мәлімдеме",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "KZ"
       ]
     },
-    "обучение": {
-      "topic": "обучение",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "nvidia": {
+      "topic": "nvidia",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "KZ"
       ]
     },
-    "авиация": {
-      "topic": "авиация",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "подъезд": {
+      "topic": "подъезд",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "KZ"
       ]
     },
-    "уральск": {
-      "topic": "уральск",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "директор": {
+      "topic": "директор",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "KZ"
       ]
     },
-    "владимир зеленский": {
-      "topic": "владимир зеленский",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "ямайка – мексика": {
+      "topic": "ямайка – мексика",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "KZ"
       ]
     },
-    "переговоры": {
-      "topic": "переговоры",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "мераб двалишвили": {
+      "topic": "мераб двалишвили",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "KZ"
       ]
     },
-    "деньги": {
-      "topic": "деньги",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "автобус": {
+      "topic": "автобус",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "KZ"
       ]
     },
-    "юрий вакулко": {
-      "topic": "юрий вакулко",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "урош медич": {
+      "topic": "урош медич",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "KZ"
       ]
     },
-    "клипперс – тандер": {
-      "topic": "клипперс – тандер",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "сокращения в 2027 году": {
+      "topic": "сокращения в 2027 году",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "RU"
       ]
     },
-    "джорджа мелони": {
-      "topic": "джорджа мелони",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "евро-футбол": {
+      "topic": "евро-футбол",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "RU"
       ]
     },
-    "бюджет": {
-      "topic": "бюджет",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "дени байсаров": {
+      "topic": "дени байсаров",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "RU"
       ]
     },
-    "урсула фон дер ляйен": {
-      "topic": "урсула фон дер ляйен",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "эмилия зингас": {
+      "topic": "эмилия зингас",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "RU"
       ]
     },
-    "гауфф, кори": {
-      "topic": "гауфф, кори",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "зимние каникулы": {
+      "topic": "зимние каникулы",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "RU"
       ]
     },
-    "погода саратов": {
-      "topic": "погода саратов",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "бостон брюинз": {
+      "topic": "бостон брюинз",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "RU"
       ]
     },
-    "аэс «аккую»": {
-      "topic": "аэс «аккую»",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "памятник": {
+      "topic": "памятник",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "RU"
       ]
     },
-    "фк ростов": {
-      "topic": "фк ростов",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "бруну фернандеш": {
+      "topic": "бруну фернандеш",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "RU"
       ]
     },
-    "криштиану роналду": {
-      "topic": "криштиану роналду",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "индекс мосбиржи": {
+      "topic": "индекс мосбиржи",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "RU"
       ]
     },
-    "дата-центр": {
-      "topic": "дата-центр",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "ска-хабаровск – ленинградец": {
+      "topic": "ска-хабаровск – ленинградец",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "RU"
       ]
     },
-    "justine lupe": {
-      "topic": "justine lupe",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "colin jost": {
+      "topic": "colin jost",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "US"
       ]
     },
-    "cher": {
-      "topic": "cher",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "snl cast": {
+      "topic": "snl cast",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "US"
       ]
     },
-    "colorado": {
-      "topic": "colorado",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "lily collins": {
+      "topic": "lily collins",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "US"
       ]
     },
-    "portland state football": {
-      "topic": "portland state football",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "icc": {
+      "topic": "icc",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
+      "regions": [
+        "GB",
+        "US"
+      ]
+    },
+    "gable steveson": {
+      "topic": "gable steveson",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "US"
       ]
     },
-    "bomb found": {
-      "topic": "bomb found",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "anthony joshua": {
+      "topic": "anthony joshua",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "US"
       ]
     },
-    "isaiah hartenstein": {
-      "topic": "isaiah hartenstein",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "michelle obama": {
+      "topic": "michelle obama",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "US"
       ]
     },
-    "alex caruso": {
-      "topic": "alex caruso",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "jeremy culhane": {
+      "topic": "jeremy culhane",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "US"
       ]
     },
-    "okc vs lac": {
-      "topic": "okc vs lac",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "cillian murphy": {
+      "topic": "cillian murphy",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "US"
       ]
     },
-    "uh football": {
-      "topic": "uh football",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "francis ngannou": {
+      "topic": "francis ngannou",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "US"
       ]
     },
-    "measles elimination status": {
-      "topic": "measles elimination status",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
-      "regions": [
-        "US"
-      ]
-    },
-    "snow forecast": {
-      "topic": "snow forecast",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "bbc cricket": {
+      "topic": "bbc cricket",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "GB"
       ]
     },
-    "stany zjednoczone": {
-      "topic": "stany zjednoczone",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "england vs australia": {
+      "topic": "england vs australia",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "GB"
       ]
     },
-    "winter fuel payment": {
-      "topic": "winter fuel payment",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "insurance": {
+      "topic": "insurance",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "GB"
       ]
     },
-    "max dowman": {
-      "topic": "max dowman",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "savings": {
+      "topic": "savings",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "GB"
       ]
     },
-    "spurs vs warriors": {
-      "topic": "spurs vs warriors",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "eng vs aus": {
+      "topic": "eng vs aus",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "GB"
       ]
     },
-    "guatemala vs canada": {
-      "topic": "guatemala vs canada",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "game pass": {
+      "topic": "game pass",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "GB"
       ]
     },
-    "bulls vs hawks": {
-      "topic": "bulls vs hawks",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "ufc 336": {
+      "topic": "ufc 336",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "GB"
       ]
     },
-    "jesús owono": {
-      "topic": "jesús owono",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "zion williamson": {
+      "topic": "zion williamson",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "GB"
       ]
     },
-    "rockstar gta vi": {
-      "topic": "rockstar gta vi",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
-      "regions": [
-        "GB"
-      ]
-    },
-    "l3harris": {
-      "topic": "l3harris",
-      "last_seen": "2026-11-14T05:55:36Z",
-      "first_seen": "2026-11-14T05:55:36Z",
+    "india vs new zealand": {
+      "topic": "india vs new zealand",
+      "last_seen": "2026-11-15T05:57:44Z",
+      "first_seen": "2026-11-15T05:57:44Z",
       "regions": [
         "GB"
       ]
