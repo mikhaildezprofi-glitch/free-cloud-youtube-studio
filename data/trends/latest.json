@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-23T15:56:18Z",
+  "generated_at": "2026-11-24T15:51:37Z",
   "regions_requested": [
     "KZ",
     "RU",
@@ -7,8 +7,8 @@
     "GB"
   ],
   "source": "Google Trends Trending Now RSS",
-  "candidate_count": 38,
-  "shortlist_count": 38,
+  "candidate_count": 39,
+  "shortlist_count": 39,
   "scoring": {
     "max_score": 100,
     "weights": {
@@ -21,7 +21,7 @@
   "source_errors": [],
   "candidates": [
     {
-      "topic": "tesla stock",
+      "topic": "teruaki sato",
       "region": "US",
       "regions": [
         "US"
@@ -29,12 +29,84 @@
       "source": "Google Trends Trending Now RSS",
       "source_url": "https://trends.google.com/trending/rss?geo=US",
       "feed_url": "https://trends.google.com/trending/rss?geo=US",
-      "published_at": "2026-11-23T15:00:00Z",
+      "published_at": "2026-11-24T14:50:00Z",
+      "approx_traffic_label": "20000+",
+      "approx_traffic_numeric": 20000,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:37Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 7,
+      "score_components": {
+        "volume": 7,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "trev alberts",
+      "region": "US",
+      "regions": [
+        "US"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=US",
+      "feed_url": "https://trends.google.com/trending/rss?geo=US",
+      "published_at": "2026-11-24T15:00:00Z",
+      "approx_traffic_label": "10000+",
+      "approx_traffic_numeric": 10000,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:37Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 4,
+      "score_components": {
+        "volume": 4,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "новости",
+      "region": "KZ",
+      "regions": [
+        "KZ"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=KZ",
+      "feed_url": "https://trends.google.com/trending/rss?geo=KZ",
+      "published_at": "2026-11-24T11:00:00Z",
+      "approx_traffic_label": "10000+",
+      "approx_traffic_numeric": 10000,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:36Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 4,
+      "score_components": {
+        "volume": 4,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "nasdaq today",
+      "region": "US",
+      "regions": [
+        "US"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=US",
+      "feed_url": "https://trends.google.com/trending/rss?geo=US",
+      "published_at": "2026-11-24T15:10:00Z",
       "approx_traffic_label": "5000+",
       "approx_traffic_numeric": 5000,
       "growth_percent": null,
       "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
+      "discovered_at": "2026-11-24T15:51:37Z",
       "previously_seen_at": null,
       "recently_seen": false,
       "score": 2,
@@ -45,7 +117,31 @@
       }
     },
     {
-      "topic": "apple stock",
+      "topic": "доход",
+      "region": "RU",
+      "regions": [
+        "RU"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=RU",
+      "feed_url": "https://trends.google.com/trending/rss?geo=RU",
+      "published_at": "2026-11-24T15:10:00Z",
+      "approx_traffic_label": "5000+",
+      "approx_traffic_numeric": 5000,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:36Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 2,
+      "score_components": {
+        "volume": 2,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "ryan mccombs drowning pool departure",
       "region": "US",
       "regions": [
         "US"
@@ -53,12 +149,12 @@
       "source": "Google Trends Trending Now RSS",
       "source_url": "https://trends.google.com/trending/rss?geo=US",
       "feed_url": "https://trends.google.com/trending/rss?geo=US",
-      "published_at": "2026-11-23T15:00:00Z",
+      "published_at": "2026-11-24T15:00:00Z",
       "approx_traffic_label": "2000+",
       "approx_traffic_numeric": 2000,
       "growth_percent": null,
       "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
+      "discovered_at": "2026-11-24T15:51:37Z",
       "previously_seen_at": null,
       "recently_seen": false,
       "score": 1,
@@ -69,7 +165,151 @@
       }
     },
     {
-      "topic": "al-shamal vs al-ahli",
+      "topic": "александр большунов",
+      "region": "RU",
+      "regions": [
+        "RU"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=RU",
+      "feed_url": "https://trends.google.com/trending/rss?geo=RU",
+      "published_at": "2026-11-24T14:50:00Z",
+      "approx_traffic_label": "2000+",
+      "approx_traffic_numeric": 2000,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:36Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 1,
+      "score_components": {
+        "volume": 1,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "ableist",
+      "region": "GB",
+      "regions": [
+        "GB"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=GB",
+      "feed_url": "https://trends.google.com/trending/rss?geo=GB",
+      "published_at": "2026-11-24T15:00:00Z",
+      "approx_traffic_label": "200+",
+      "approx_traffic_numeric": 200,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:37Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 0,
+      "score_components": {
+        "volume": 0,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "airbus a320",
+      "region": "RU",
+      "regions": [
+        "RU"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=RU",
+      "feed_url": "https://trends.google.com/trending/rss?geo=RU",
+      "published_at": "2026-11-24T15:30:00Z",
+      "approx_traffic_label": "200+",
+      "approx_traffic_numeric": 200,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:36Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 0,
+      "score_components": {
+        "volume": 0,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "algae",
+      "region": "GB",
+      "regions": [
+        "GB"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=GB",
+      "feed_url": "https://trends.google.com/trending/rss?geo=GB",
+      "published_at": "2026-11-24T14:30:00Z",
+      "approx_traffic_label": "500+",
+      "approx_traffic_numeric": 500,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:37Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 0,
+      "score_components": {
+        "volume": 0,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "amanda owen",
+      "region": "GB",
+      "regions": [
+        "GB"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=GB",
+      "feed_url": "https://trends.google.com/trending/rss?geo=GB",
+      "published_at": "2026-11-24T15:00:00Z",
+      "approx_traffic_label": "1000+",
+      "approx_traffic_numeric": 1000,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:37Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 0,
+      "score_components": {
+        "volume": 0,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "galatasaray",
+      "region": "GB",
+      "regions": [
+        "GB"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=GB",
+      "feed_url": "https://trends.google.com/trending/rss?geo=GB",
+      "published_at": "2026-11-24T15:30:00Z",
+      "approx_traffic_label": "200+",
+      "approx_traffic_numeric": 200,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:37Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 0,
+      "score_components": {
+        "volume": 0,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "jonbenet ramsey",
       "region": "US",
       "regions": [
         "GB",
@@ -78,180 +318,12 @@
       "source": "Google Trends Trending Now RSS",
       "source_url": "https://trends.google.com/trending/rss?geo=US",
       "feed_url": "https://trends.google.com/trending/rss?geo=US",
-      "published_at": "2026-11-23T15:10:00Z",
-      "approx_traffic_label": "500+",
-      "approx_traffic_numeric": 500,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "btc usd",
-      "region": "GB",
-      "regions": [
-        "GB"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=GB",
-      "feed_url": "https://trends.google.com/trending/rss?geo=GB",
-      "published_at": "2026-11-23T15:10:00Z",
-      "approx_traffic_label": "200+",
-      "approx_traffic_numeric": 200,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:18Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "christopher briney",
-      "region": "US",
-      "regions": [
-        "US"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=US",
-      "feed_url": "https://trends.google.com/trending/rss?geo=US",
-      "published_at": "2026-11-23T15:40:00Z",
-      "approx_traffic_label": "500+",
-      "approx_traffic_numeric": 500,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "costco stock",
-      "region": "US",
-      "regions": [
-        "US"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=US",
-      "feed_url": "https://trends.google.com/trending/rss?geo=US",
-      "published_at": "2026-11-23T15:20:00Z",
-      "approx_traffic_label": "500+",
-      "approx_traffic_numeric": 500,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "davidson basketball",
-      "region": "US",
-      "regions": [
-        "US"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=US",
-      "feed_url": "https://trends.google.com/trending/rss?geo=US",
-      "published_at": "2026-11-23T15:30:00Z",
-      "approx_traffic_label": "200+",
-      "approx_traffic_numeric": 200,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "dow jones index",
-      "region": "GB",
-      "regions": [
-        "GB"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=GB",
-      "feed_url": "https://trends.google.com/trending/rss?geo=GB",
-      "published_at": "2026-11-23T15:10:00Z",
-      "approx_traffic_label": "200+",
-      "approx_traffic_numeric": 200,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:18Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "eugene laverty",
-      "region": "GB",
-      "regions": [
-        "GB"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=GB",
-      "feed_url": "https://trends.google.com/trending/rss?geo=GB",
-      "published_at": "2026-11-23T14:50:00Z",
-      "approx_traffic_label": "500+",
-      "approx_traffic_numeric": 500,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:18Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "hacker",
-      "region": "GB",
-      "regions": [
-        "GB"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=GB",
-      "feed_url": "https://trends.google.com/trending/rss?geo=GB",
-      "published_at": "2026-11-23T15:20:00Z",
+      "published_at": "2026-11-24T15:30:00Z",
       "approx_traffic_label": "1000+",
       "approx_traffic_numeric": 1000,
       "growth_percent": null,
       "description": "",
-      "discovered_at": "2026-11-23T15:56:18Z",
+      "discovered_at": "2026-11-24T15:51:37Z",
       "previously_seen_at": null,
       "recently_seen": false,
       "score": 0,
@@ -262,55 +334,7 @@
       }
     },
     {
-      "topic": "ko stock",
-      "region": "US",
-      "regions": [
-        "US"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=US",
-      "feed_url": "https://trends.google.com/trending/rss?geo=US",
-      "published_at": "2026-11-23T15:00:00Z",
-      "approx_traffic_label": "200+",
-      "approx_traffic_numeric": 200,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "leonida",
-      "region": "RU",
-      "regions": [
-        "RU"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=RU",
-      "feed_url": "https://trends.google.com/trending/rss?geo=RU",
-      "published_at": "2026-11-23T15:10:00Z",
-      "approx_traffic_label": "100+",
-      "approx_traffic_numeric": 100,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "micron share price",
+      "topic": "lance stroll honda horsepower request",
       "region": "GB",
       "regions": [
         "GB"
@@ -318,12 +342,12 @@
       "source": "Google Trends Trending Now RSS",
       "source_url": "https://trends.google.com/trending/rss?geo=GB",
       "feed_url": "https://trends.google.com/trending/rss?geo=GB",
-      "published_at": "2026-11-23T14:50:00Z",
+      "published_at": "2026-11-24T14:40:00Z",
       "approx_traffic_label": "200+",
       "approx_traffic_numeric": 200,
       "growth_percent": null,
       "description": "",
-      "discovered_at": "2026-11-23T15:56:18Z",
+      "discovered_at": "2026-11-24T15:51:37Z",
       "previously_seen_at": null,
       "recently_seen": false,
       "score": 0,
@@ -334,31 +358,7 @@
       }
     },
     {
-      "topic": "next vendor cyber security breach",
-      "region": "GB",
-      "regions": [
-        "GB"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=GB",
-      "feed_url": "https://trends.google.com/trending/rss?geo=GB",
-      "published_at": "2026-11-23T15:10:00Z",
-      "approx_traffic_label": "200+",
-      "approx_traffic_numeric": 200,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:18Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "north korea",
+      "topic": "nasdaq index",
       "region": "US",
       "regions": [
         "US"
@@ -366,12 +366,12 @@
       "source": "Google Trends Trending Now RSS",
       "source_url": "https://trends.google.com/trending/rss?geo=US",
       "feed_url": "https://trends.google.com/trending/rss?geo=US",
-      "published_at": "2026-11-23T15:30:00Z",
+      "published_at": "2026-11-24T15:20:00Z",
       "approx_traffic_label": "200+",
       "approx_traffic_numeric": 200,
       "growth_percent": null,
       "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
+      "discovered_at": "2026-11-24T15:51:37Z",
       "previously_seen_at": null,
       "recently_seen": false,
       "score": 0,
@@ -382,20 +382,20 @@
       }
     },
     {
-      "topic": "nvidia stock",
-      "region": "KZ",
+      "topic": "popcaan concert",
+      "region": "US",
       "regions": [
-        "KZ"
+        "US"
       ],
       "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=KZ",
-      "feed_url": "https://trends.google.com/trending/rss?geo=KZ",
-      "published_at": "2026-11-23T14:30:00Z",
+      "source_url": "https://trends.google.com/trending/rss?geo=US",
+      "feed_url": "https://trends.google.com/trending/rss?geo=US",
+      "published_at": "2026-11-24T14:40:00Z",
       "approx_traffic_label": "500+",
       "approx_traffic_numeric": 500,
       "growth_percent": null,
       "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
+      "discovered_at": "2026-11-24T15:51:37Z",
       "previously_seen_at": null,
       "recently_seen": false,
       "score": 0,
@@ -406,7 +406,31 @@
       }
     },
     {
-      "topic": "pfe stock",
+      "topic": "prince harry visa",
+      "region": "GB",
+      "regions": [
+        "GB"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=GB",
+      "feed_url": "https://trends.google.com/trending/rss?geo=GB",
+      "published_at": "2026-11-24T15:20:00Z",
+      "approx_traffic_label": "200+",
+      "approx_traffic_numeric": 200,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:37Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 0,
+      "score_components": {
+        "volume": 0,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "ps plus extra games november 2026",
       "region": "US",
       "regions": [
         "US"
@@ -414,12 +438,12 @@
       "source": "Google Trends Trending Now RSS",
       "source_url": "https://trends.google.com/trending/rss?geo=US",
       "feed_url": "https://trends.google.com/trending/rss?geo=US",
-      "published_at": "2026-11-23T15:10:00Z",
+      "published_at": "2026-11-24T15:00:00Z",
       "approx_traffic_label": "200+",
       "approx_traffic_numeric": 200,
       "growth_percent": null,
       "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
+      "discovered_at": "2026-11-24T15:51:37Z",
       "previously_seen_at": null,
       "recently_seen": false,
       "score": 0,
@@ -430,7 +454,7 @@
       }
     },
     {
-      "topic": "sophie cunningham indiana fever offseason",
+      "topic": "rudy giuliani",
       "region": "US",
       "regions": [
         "US"
@@ -438,36 +462,12 @@
       "source": "Google Trends Trending Now RSS",
       "source_url": "https://trends.google.com/trending/rss?geo=US",
       "feed_url": "https://trends.google.com/trending/rss?geo=US",
-      "published_at": "2026-11-23T15:20:00Z",
-      "approx_traffic_label": "1000+",
-      "approx_traffic_numeric": 1000,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "spx",
-      "region": "GB",
-      "regions": [
-        "GB"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=GB",
-      "feed_url": "https://trends.google.com/trending/rss?geo=GB",
-      "published_at": "2026-11-23T15:10:00Z",
+      "published_at": "2026-11-24T15:20:00Z",
       "approx_traffic_label": "200+",
       "approx_traffic_numeric": 200,
       "growth_percent": null,
       "description": "",
-      "discovered_at": "2026-11-23T15:56:18Z",
+      "discovered_at": "2026-11-24T15:51:37Z",
       "previously_seen_at": null,
       "recently_seen": false,
       "score": 0,
@@ -478,7 +478,31 @@
       }
     },
     {
-      "topic": "stadler rail",
+      "topic": "seiya suzuki",
+      "region": "US",
+      "regions": [
+        "US"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=US",
+      "feed_url": "https://trends.google.com/trending/rss?geo=US",
+      "published_at": "2026-11-24T15:10:00Z",
+      "approx_traffic_label": "1000+",
+      "approx_traffic_numeric": 1000,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:37Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 0,
+      "score_components": {
+        "volume": 0,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "swift",
       "region": "KZ",
       "regions": [
         "KZ"
@@ -486,12 +510,12 @@
       "source": "Google Trends Trending Now RSS",
       "source_url": "https://trends.google.com/trending/rss?geo=KZ",
       "feed_url": "https://trends.google.com/trending/rss?geo=KZ",
-      "published_at": "2026-11-23T13:30:00Z",
+      "published_at": "2026-11-24T11:30:00Z",
       "approx_traffic_label": "1000+",
       "approx_traffic_numeric": 1000,
       "growth_percent": null,
       "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
+      "discovered_at": "2026-11-24T15:51:36Z",
       "previously_seen_at": null,
       "recently_seen": false,
       "score": 0,
@@ -502,7 +526,7 @@
       }
     },
     {
-      "topic": "uk eu post brexit relationship reset",
+      "topic": "who is ian huntley",
       "region": "GB",
       "regions": [
         "GB"
@@ -510,12 +534,12 @@
       "source": "Google Trends Trending Now RSS",
       "source_url": "https://trends.google.com/trending/rss?geo=GB",
       "feed_url": "https://trends.google.com/trending/rss?geo=GB",
-      "published_at": "2026-11-23T15:00:00Z",
+      "published_at": "2026-11-24T15:20:00Z",
       "approx_traffic_label": "200+",
       "approx_traffic_numeric": 200,
       "growth_percent": null,
       "description": "",
-      "discovered_at": "2026-11-23T15:56:18Z",
+      "discovered_at": "2026-11-24T15:51:37Z",
       "previously_seen_at": null,
       "recently_seen": false,
       "score": 0,
@@ -526,31 +550,7 @@
       }
     },
     {
-      "topic": "visual studio code",
-      "region": "RU",
-      "regions": [
-        "RU"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=RU",
-      "feed_url": "https://trends.google.com/trending/rss?geo=RU",
-      "published_at": "2026-11-23T15:00:00Z",
-      "approx_traffic_label": "100+",
-      "approx_traffic_numeric": 100,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "xabi alonso",
+      "topic": "xbox game pass new games november",
       "region": "GB",
       "regions": [
         "GB"
@@ -558,12 +558,12 @@
       "source": "Google Trends Trending Now RSS",
       "source_url": "https://trends.google.com/trending/rss?geo=GB",
       "feed_url": "https://trends.google.com/trending/rss?geo=GB",
-      "published_at": "2026-11-23T15:10:00Z",
+      "published_at": "2026-11-24T14:50:00Z",
       "approx_traffic_label": "200+",
       "approx_traffic_numeric": 200,
       "growth_percent": null,
       "description": "",
-      "discovered_at": "2026-11-23T15:56:18Z",
+      "discovered_at": "2026-11-24T15:51:37Z",
       "previously_seen_at": null,
       "recently_seen": false,
       "score": 0,
@@ -574,20 +574,20 @@
       }
     },
     {
-      "topic": "александр усик",
-      "region": "RU",
+      "topic": "yoro",
+      "region": "GB",
       "regions": [
-        "RU"
+        "GB"
       ],
       "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=RU",
-      "feed_url": "https://trends.google.com/trending/rss?geo=RU",
-      "published_at": "2026-11-23T15:40:00Z",
-      "approx_traffic_label": "200+",
-      "approx_traffic_numeric": 200,
+      "source_url": "https://trends.google.com/trending/rss?geo=GB",
+      "feed_url": "https://trends.google.com/trending/rss?geo=GB",
+      "published_at": "2026-11-24T15:20:00Z",
+      "approx_traffic_label": "1000+",
+      "approx_traffic_numeric": 1000,
       "growth_percent": null,
       "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
+      "discovered_at": "2026-11-24T15:51:37Z",
       "previously_seen_at": null,
       "recently_seen": false,
       "score": 0,
@@ -598,7 +598,7 @@
       }
     },
     {
-      "topic": "алматы",
+      "topic": "андрей белоусов",
       "region": "KZ",
       "regions": [
         "KZ"
@@ -606,85 +606,12 @@
       "source": "Google Trends Trending Now RSS",
       "source_url": "https://trends.google.com/trending/rss?geo=KZ",
       "feed_url": "https://trends.google.com/trending/rss?geo=KZ",
-      "published_at": "2026-11-23T15:10:00Z",
-      "approx_traffic_label": "1000+",
-      "approx_traffic_numeric": 1000,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "аль-шамаль – аль-ахли джидда",
-      "region": "KZ",
-      "regions": [
-        "KZ",
-        "RU"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=KZ",
-      "feed_url": "https://trends.google.com/trending/rss?geo=KZ",
-      "published_at": "2026-11-23T15:20:00Z",
-      "approx_traffic_label": "1000+",
-      "approx_traffic_numeric": 1000,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "бетина попова",
-      "region": "RU",
-      "regions": [
-        "RU"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=RU",
-      "feed_url": "https://trends.google.com/trending/rss?geo=RU",
-      "published_at": "2026-11-23T15:00:00Z",
-      "approx_traffic_label": "100+",
-      "approx_traffic_numeric": 100,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "вратарь",
-      "region": "RU",
-      "regions": [
-        "RU"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=RU",
-      "feed_url": "https://trends.google.com/trending/rss?geo=RU",
-      "published_at": "2026-11-23T15:10:00Z",
+      "published_at": "2026-11-24T12:40:00Z",
       "approx_traffic_label": "500+",
       "approx_traffic_numeric": 500,
       "growth_percent": null,
       "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
+      "discovered_at": "2026-11-24T15:51:36Z",
       "previously_seen_at": null,
       "recently_seen": false,
       "score": 0,
@@ -695,31 +622,7 @@
       }
     },
     {
-      "topic": "газопровод",
-      "region": "KZ",
-      "regions": [
-        "KZ"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=KZ",
-      "feed_url": "https://trends.google.com/trending/rss?geo=KZ",
-      "published_at": "2026-11-23T13:30:00Z",
-      "approx_traffic_label": "200+",
-      "approx_traffic_numeric": 200,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "ливан",
+      "topic": "елена ильиных",
       "region": "RU",
       "regions": [
         "RU"
@@ -727,12 +630,12 @@
       "source": "Google Trends Trending Now RSS",
       "source_url": "https://trends.google.com/trending/rss?geo=RU",
       "feed_url": "https://trends.google.com/trending/rss?geo=RU",
-      "published_at": "2026-11-23T15:20:00Z",
+      "published_at": "2026-11-24T15:00:00Z",
       "approx_traffic_label": "100+",
       "approx_traffic_numeric": 100,
       "growth_percent": null,
       "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
+      "discovered_at": "2026-11-24T15:51:36Z",
       "previously_seen_at": null,
       "recently_seen": false,
       "score": 0,
@@ -743,31 +646,7 @@
       }
     },
     {
-      "topic": "лунный календарь",
-      "region": "RU",
-      "regions": [
-        "RU"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=RU",
-      "feed_url": "https://trends.google.com/trending/rss?geo=RU",
-      "published_at": "2026-11-23T15:30:00Z",
-      "approx_traffic_label": "100+",
-      "approx_traffic_numeric": 100,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "мясо",
+      "topic": "концерт",
       "region": "KZ",
       "regions": [
         "KZ"
@@ -775,108 +654,12 @@
       "source": "Google Trends Trending Now RSS",
       "source_url": "https://trends.google.com/trending/rss?geo=KZ",
       "feed_url": "https://trends.google.com/trending/rss?geo=KZ",
-      "published_at": "2026-11-23T14:30:00Z",
-      "approx_traffic_label": "200+",
-      "approx_traffic_numeric": 200,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "один дома",
-      "region": "RU",
-      "regions": [
-        "RU"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=RU",
-      "feed_url": "https://trends.google.com/trending/rss?geo=RU",
-      "published_at": "2026-11-23T15:40:00Z",
-      "approx_traffic_label": "100+",
-      "approx_traffic_numeric": 100,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "полицейский",
-      "region": "KZ",
-      "regions": [
-        "KZ"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=KZ",
-      "feed_url": "https://trends.google.com/trending/rss?geo=KZ",
-      "published_at": "2026-11-23T14:10:00Z",
-      "approx_traffic_label": "200+",
-      "approx_traffic_numeric": 200,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "сибирь – северсталь",
-      "region": "KZ",
-      "regions": [
-        "KZ"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=KZ",
-      "feed_url": "https://trends.google.com/trending/rss?geo=KZ",
-      "published_at": "2026-11-23T14:50:00Z",
-      "approx_traffic_label": "200+",
-      "approx_traffic_numeric": 200,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "сметана",
-      "region": "KZ",
-      "regions": [
-        "KZ"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=KZ",
-      "feed_url": "https://trends.google.com/trending/rss?geo=KZ",
-      "published_at": "2026-11-23T14:10:00Z",
+      "published_at": "2026-11-24T13:00:00Z",
       "approx_traffic_label": "500+",
       "approx_traffic_numeric": 500,
       "growth_percent": null,
       "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
+      "discovered_at": "2026-11-24T15:51:36Z",
       "previously_seen_at": null,
       "recently_seen": false,
       "score": 0,
@@ -887,31 +670,7 @@
       }
     },
     {
-      "topic": "хуанг",
-      "region": "KZ",
-      "regions": [
-        "KZ"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=KZ",
-      "feed_url": "https://trends.google.com/trending/rss?geo=KZ",
-      "published_at": "2026-11-23T15:00:00Z",
-      "approx_traffic_label": "100+",
-      "approx_traffic_numeric": 100,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "эльмир магеррамов",
+      "topic": "краснодар",
       "region": "RU",
       "regions": [
         "RU"
@@ -919,12 +678,276 @@
       "source": "Google Trends Trending Now RSS",
       "source_url": "https://trends.google.com/trending/rss?geo=RU",
       "feed_url": "https://trends.google.com/trending/rss?geo=RU",
-      "published_at": "2026-11-23T15:30:00Z",
+      "published_at": "2026-11-24T15:30:00Z",
+      "approx_traffic_label": "1000+",
+      "approx_traffic_numeric": 1000,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:36Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 0,
+      "score_components": {
+        "volume": 0,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "кристен михал",
+      "region": "KZ",
+      "regions": [
+        "KZ"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=KZ",
+      "feed_url": "https://trends.google.com/trending/rss?geo=KZ",
+      "published_at": "2026-11-24T11:20:00Z",
+      "approx_traffic_label": "500+",
+      "approx_traffic_numeric": 500,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:36Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 0,
+      "score_components": {
+        "volume": 0,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "лср",
+      "region": "RU",
+      "regions": [
+        "RU"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=RU",
+      "feed_url": "https://trends.google.com/trending/rss?geo=RU",
+      "published_at": "2026-11-24T15:00:00Z",
       "approx_traffic_label": "100+",
       "approx_traffic_numeric": 100,
       "growth_percent": null,
       "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
+      "discovered_at": "2026-11-24T15:51:36Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 0,
+      "score_components": {
+        "volume": 0,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "металлург мг – динамо мн",
+      "region": "KZ",
+      "regions": [
+        "KZ"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=KZ",
+      "feed_url": "https://trends.google.com/trending/rss?geo=KZ",
+      "published_at": "2026-11-24T14:00:00Z",
+      "approx_traffic_label": "200+",
+      "approx_traffic_numeric": 200,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:36Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 0,
+      "score_components": {
+        "volume": 0,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "погода уральск",
+      "region": "KZ",
+      "regions": [
+        "KZ"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=KZ",
+      "feed_url": "https://trends.google.com/trending/rss?geo=KZ",
+      "published_at": "2026-11-24T14:50:00Z",
+      "approx_traffic_label": "200+",
+      "approx_traffic_numeric": 200,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:36Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 0,
+      "score_components": {
+        "volume": 0,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "прогресс мс",
+      "region": "RU",
+      "regions": [
+        "RU"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=RU",
+      "feed_url": "https://trends.google.com/trending/rss?geo=RU",
+      "published_at": "2026-11-24T15:00:00Z",
+      "approx_traffic_label": "100+",
+      "approx_traffic_numeric": 100,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:36Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 0,
+      "score_components": {
+        "volume": 0,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "самұрық-қазына",
+      "region": "KZ",
+      "regions": [
+        "KZ"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=KZ",
+      "feed_url": "https://trends.google.com/trending/rss?geo=KZ",
+      "published_at": "2026-11-24T13:00:00Z",
+      "approx_traffic_label": "100+",
+      "approx_traffic_numeric": 100,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:36Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 0,
+      "score_components": {
+        "volume": 0,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "совет по правам человека",
+      "region": "RU",
+      "regions": [
+        "RU"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=RU",
+      "feed_url": "https://trends.google.com/trending/rss?geo=RU",
+      "published_at": "2026-11-24T14:40:00Z",
+      "approx_traffic_label": "1000+",
+      "approx_traffic_numeric": 1000,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:36Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 0,
+      "score_components": {
+        "volume": 0,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "строительство",
+      "region": "KZ",
+      "regions": [
+        "KZ"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=KZ",
+      "feed_url": "https://trends.google.com/trending/rss?geo=KZ",
+      "published_at": "2026-11-24T13:20:00Z",
+      "approx_traffic_label": "200+",
+      "approx_traffic_numeric": 200,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:36Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 0,
+      "score_components": {
+        "volume": 0,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "тренер",
+      "region": "KZ",
+      "regions": [
+        "KZ"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=KZ",
+      "feed_url": "https://trends.google.com/trending/rss?geo=KZ",
+      "published_at": "2026-11-24T14:20:00Z",
+      "approx_traffic_label": "200+",
+      "approx_traffic_numeric": 200,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:36Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 0,
+      "score_components": {
+        "volume": 0,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "шабаб аль-ахли – аль-кадисия эль-хубар",
+      "region": "RU",
+      "regions": [
+        "RU"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=RU",
+      "feed_url": "https://trends.google.com/trending/rss?geo=RU",
+      "published_at": "2026-11-24T15:30:00Z",
+      "approx_traffic_label": "200+",
+      "approx_traffic_numeric": 200,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:36Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 0,
+      "score_components": {
+        "volume": 0,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "шенгенская зона",
+      "region": "RU",
+      "regions": [
+        "RU"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=RU",
+      "feed_url": "https://trends.google.com/trending/rss?geo=RU",
+      "published_at": "2026-11-24T14:40:00Z",
+      "approx_traffic_label": "200+",
+      "approx_traffic_numeric": 200,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:36Z",
       "previously_seen_at": null,
       "recently_seen": false,
       "score": 0,
@@ -937,7 +960,7 @@
   ],
   "shortlist": [
     {
-      "topic": "tesla stock",
+      "topic": "teruaki sato",
       "region": "US",
       "regions": [
         "US"
@@ -945,12 +968,84 @@
       "source": "Google Trends Trending Now RSS",
       "source_url": "https://trends.google.com/trending/rss?geo=US",
       "feed_url": "https://trends.google.com/trending/rss?geo=US",
-      "published_at": "2026-11-23T15:00:00Z",
+      "published_at": "2026-11-24T14:50:00Z",
+      "approx_traffic_label": "20000+",
+      "approx_traffic_numeric": 20000,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:37Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 7,
+      "score_components": {
+        "volume": 7,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "trev alberts",
+      "region": "US",
+      "regions": [
+        "US"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=US",
+      "feed_url": "https://trends.google.com/trending/rss?geo=US",
+      "published_at": "2026-11-24T15:00:00Z",
+      "approx_traffic_label": "10000+",
+      "approx_traffic_numeric": 10000,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:37Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 4,
+      "score_components": {
+        "volume": 4,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "новости",
+      "region": "KZ",
+      "regions": [
+        "KZ"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=KZ",
+      "feed_url": "https://trends.google.com/trending/rss?geo=KZ",
+      "published_at": "2026-11-24T11:00:00Z",
+      "approx_traffic_label": "10000+",
+      "approx_traffic_numeric": 10000,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:36Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 4,
+      "score_components": {
+        "volume": 4,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "nasdaq today",
+      "region": "US",
+      "regions": [
+        "US"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=US",
+      "feed_url": "https://trends.google.com/trending/rss?geo=US",
+      "published_at": "2026-11-24T15:10:00Z",
       "approx_traffic_label": "5000+",
       "approx_traffic_numeric": 5000,
       "growth_percent": null,
       "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
+      "discovered_at": "2026-11-24T15:51:37Z",
       "previously_seen_at": null,
       "recently_seen": false,
       "score": 2,
@@ -961,7 +1056,31 @@
       }
     },
     {
-      "topic": "apple stock",
+      "topic": "доход",
+      "region": "RU",
+      "regions": [
+        "RU"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=RU",
+      "feed_url": "https://trends.google.com/trending/rss?geo=RU",
+      "published_at": "2026-11-24T15:10:00Z",
+      "approx_traffic_label": "5000+",
+      "approx_traffic_numeric": 5000,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:36Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 2,
+      "score_components": {
+        "volume": 2,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "ryan mccombs drowning pool departure",
       "region": "US",
       "regions": [
         "US"
@@ -969,12 +1088,12 @@
       "source": "Google Trends Trending Now RSS",
       "source_url": "https://trends.google.com/trending/rss?geo=US",
       "feed_url": "https://trends.google.com/trending/rss?geo=US",
-      "published_at": "2026-11-23T15:00:00Z",
+      "published_at": "2026-11-24T15:00:00Z",
       "approx_traffic_label": "2000+",
       "approx_traffic_numeric": 2000,
       "growth_percent": null,
       "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
+      "discovered_at": "2026-11-24T15:51:37Z",
       "previously_seen_at": null,
       "recently_seen": false,
       "score": 1,
@@ -985,7 +1104,151 @@
       }
     },
     {
-      "topic": "al-shamal vs al-ahli",
+      "topic": "александр большунов",
+      "region": "RU",
+      "regions": [
+        "RU"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=RU",
+      "feed_url": "https://trends.google.com/trending/rss?geo=RU",
+      "published_at": "2026-11-24T14:50:00Z",
+      "approx_traffic_label": "2000+",
+      "approx_traffic_numeric": 2000,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:36Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 1,
+      "score_components": {
+        "volume": 1,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "ableist",
+      "region": "GB",
+      "regions": [
+        "GB"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=GB",
+      "feed_url": "https://trends.google.com/trending/rss?geo=GB",
+      "published_at": "2026-11-24T15:00:00Z",
+      "approx_traffic_label": "200+",
+      "approx_traffic_numeric": 200,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:37Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 0,
+      "score_components": {
+        "volume": 0,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "airbus a320",
+      "region": "RU",
+      "regions": [
+        "RU"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=RU",
+      "feed_url": "https://trends.google.com/trending/rss?geo=RU",
+      "published_at": "2026-11-24T15:30:00Z",
+      "approx_traffic_label": "200+",
+      "approx_traffic_numeric": 200,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:36Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 0,
+      "score_components": {
+        "volume": 0,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "algae",
+      "region": "GB",
+      "regions": [
+        "GB"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=GB",
+      "feed_url": "https://trends.google.com/trending/rss?geo=GB",
+      "published_at": "2026-11-24T14:30:00Z",
+      "approx_traffic_label": "500+",
+      "approx_traffic_numeric": 500,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:37Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 0,
+      "score_components": {
+        "volume": 0,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "amanda owen",
+      "region": "GB",
+      "regions": [
+        "GB"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=GB",
+      "feed_url": "https://trends.google.com/trending/rss?geo=GB",
+      "published_at": "2026-11-24T15:00:00Z",
+      "approx_traffic_label": "1000+",
+      "approx_traffic_numeric": 1000,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:37Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 0,
+      "score_components": {
+        "volume": 0,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "galatasaray",
+      "region": "GB",
+      "regions": [
+        "GB"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=GB",
+      "feed_url": "https://trends.google.com/trending/rss?geo=GB",
+      "published_at": "2026-11-24T15:30:00Z",
+      "approx_traffic_label": "200+",
+      "approx_traffic_numeric": 200,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:37Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 0,
+      "score_components": {
+        "volume": 0,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "jonbenet ramsey",
       "region": "US",
       "regions": [
         "GB",
@@ -994,180 +1257,12 @@
       "source": "Google Trends Trending Now RSS",
       "source_url": "https://trends.google.com/trending/rss?geo=US",
       "feed_url": "https://trends.google.com/trending/rss?geo=US",
-      "published_at": "2026-11-23T15:10:00Z",
-      "approx_traffic_label": "500+",
-      "approx_traffic_numeric": 500,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "btc usd",
-      "region": "GB",
-      "regions": [
-        "GB"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=GB",
-      "feed_url": "https://trends.google.com/trending/rss?geo=GB",
-      "published_at": "2026-11-23T15:10:00Z",
-      "approx_traffic_label": "200+",
-      "approx_traffic_numeric": 200,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:18Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "christopher briney",
-      "region": "US",
-      "regions": [
-        "US"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=US",
-      "feed_url": "https://trends.google.com/trending/rss?geo=US",
-      "published_at": "2026-11-23T15:40:00Z",
-      "approx_traffic_label": "500+",
-      "approx_traffic_numeric": 500,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "costco stock",
-      "region": "US",
-      "regions": [
-        "US"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=US",
-      "feed_url": "https://trends.google.com/trending/rss?geo=US",
-      "published_at": "2026-11-23T15:20:00Z",
-      "approx_traffic_label": "500+",
-      "approx_traffic_numeric": 500,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "davidson basketball",
-      "region": "US",
-      "regions": [
-        "US"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=US",
-      "feed_url": "https://trends.google.com/trending/rss?geo=US",
-      "published_at": "2026-11-23T15:30:00Z",
-      "approx_traffic_label": "200+",
-      "approx_traffic_numeric": 200,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "dow jones index",
-      "region": "GB",
-      "regions": [
-        "GB"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=GB",
-      "feed_url": "https://trends.google.com/trending/rss?geo=GB",
-      "published_at": "2026-11-23T15:10:00Z",
-      "approx_traffic_label": "200+",
-      "approx_traffic_numeric": 200,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:18Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "eugene laverty",
-      "region": "GB",
-      "regions": [
-        "GB"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=GB",
-      "feed_url": "https://trends.google.com/trending/rss?geo=GB",
-      "published_at": "2026-11-23T14:50:00Z",
-      "approx_traffic_label": "500+",
-      "approx_traffic_numeric": 500,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:18Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "hacker",
-      "region": "GB",
-      "regions": [
-        "GB"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=GB",
-      "feed_url": "https://trends.google.com/trending/rss?geo=GB",
-      "published_at": "2026-11-23T15:20:00Z",
+      "published_at": "2026-11-24T15:30:00Z",
       "approx_traffic_label": "1000+",
       "approx_traffic_numeric": 1000,
       "growth_percent": null,
       "description": "",
-      "discovered_at": "2026-11-23T15:56:18Z",
+      "discovered_at": "2026-11-24T15:51:37Z",
       "previously_seen_at": null,
       "recently_seen": false,
       "score": 0,
@@ -1178,55 +1273,7 @@
       }
     },
     {
-      "topic": "ko stock",
-      "region": "US",
-      "regions": [
-        "US"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=US",
-      "feed_url": "https://trends.google.com/trending/rss?geo=US",
-      "published_at": "2026-11-23T15:00:00Z",
-      "approx_traffic_label": "200+",
-      "approx_traffic_numeric": 200,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "leonida",
-      "region": "RU",
-      "regions": [
-        "RU"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=RU",
-      "feed_url": "https://trends.google.com/trending/rss?geo=RU",
-      "published_at": "2026-11-23T15:10:00Z",
-      "approx_traffic_label": "100+",
-      "approx_traffic_numeric": 100,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "micron share price",
+      "topic": "lance stroll honda horsepower request",
       "region": "GB",
       "regions": [
         "GB"
@@ -1234,12 +1281,12 @@
       "source": "Google Trends Trending Now RSS",
       "source_url": "https://trends.google.com/trending/rss?geo=GB",
       "feed_url": "https://trends.google.com/trending/rss?geo=GB",
-      "published_at": "2026-11-23T14:50:00Z",
+      "published_at": "2026-11-24T14:40:00Z",
       "approx_traffic_label": "200+",
       "approx_traffic_numeric": 200,
       "growth_percent": null,
       "description": "",
-      "discovered_at": "2026-11-23T15:56:18Z",
+      "discovered_at": "2026-11-24T15:51:37Z",
       "previously_seen_at": null,
       "recently_seen": false,
       "score": 0,
@@ -1250,31 +1297,7 @@
       }
     },
     {
-      "topic": "next vendor cyber security breach",
-      "region": "GB",
-      "regions": [
-        "GB"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=GB",
-      "feed_url": "https://trends.google.com/trending/rss?geo=GB",
-      "published_at": "2026-11-23T15:10:00Z",
-      "approx_traffic_label": "200+",
-      "approx_traffic_numeric": 200,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:18Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "north korea",
+      "topic": "nasdaq index",
       "region": "US",
       "regions": [
         "US"
@@ -1282,12 +1305,12 @@
       "source": "Google Trends Trending Now RSS",
       "source_url": "https://trends.google.com/trending/rss?geo=US",
       "feed_url": "https://trends.google.com/trending/rss?geo=US",
-      "published_at": "2026-11-23T15:30:00Z",
+      "published_at": "2026-11-24T15:20:00Z",
       "approx_traffic_label": "200+",
       "approx_traffic_numeric": 200,
       "growth_percent": null,
       "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
+      "discovered_at": "2026-11-24T15:51:37Z",
       "previously_seen_at": null,
       "recently_seen": false,
       "score": 0,
@@ -1298,20 +1321,20 @@
       }
     },
     {
-      "topic": "nvidia stock",
-      "region": "KZ",
+      "topic": "popcaan concert",
+      "region": "US",
       "regions": [
-        "KZ"
+        "US"
       ],
       "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=KZ",
-      "feed_url": "https://trends.google.com/trending/rss?geo=KZ",
-      "published_at": "2026-11-23T14:30:00Z",
+      "source_url": "https://trends.google.com/trending/rss?geo=US",
+      "feed_url": "https://trends.google.com/trending/rss?geo=US",
+      "published_at": "2026-11-24T14:40:00Z",
       "approx_traffic_label": "500+",
       "approx_traffic_numeric": 500,
       "growth_percent": null,
       "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
+      "discovered_at": "2026-11-24T15:51:37Z",
       "previously_seen_at": null,
       "recently_seen": false,
       "score": 0,
@@ -1322,55 +1345,7 @@
       }
     },
     {
-      "topic": "pfe stock",
-      "region": "US",
-      "regions": [
-        "US"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=US",
-      "feed_url": "https://trends.google.com/trending/rss?geo=US",
-      "published_at": "2026-11-23T15:10:00Z",
-      "approx_traffic_label": "200+",
-      "approx_traffic_numeric": 200,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "sophie cunningham indiana fever offseason",
-      "region": "US",
-      "regions": [
-        "US"
-      ],
-      "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=US",
-      "feed_url": "https://trends.google.com/trending/rss?geo=US",
-      "published_at": "2026-11-23T15:20:00Z",
-      "approx_traffic_label": "1000+",
-      "approx_traffic_numeric": 1000,
-      "growth_percent": null,
-      "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
-      "previously_seen_at": null,
-      "recently_seen": false,
-      "score": 0,
-      "score_components": {
-        "volume": 0,
-        "growth": 0,
-        "freshness": 0
-      }
-    },
-    {
-      "topic": "spx",
+      "topic": "prince harry visa",
       "region": "GB",
       "regions": [
         "GB"
@@ -1378,12 +1353,12 @@
       "source": "Google Trends Trending Now RSS",
       "source_url": "https://trends.google.com/trending/rss?geo=GB",
       "feed_url": "https://trends.google.com/trending/rss?geo=GB",
-      "published_at": "2026-11-23T15:10:00Z",
+      "published_at": "2026-11-24T15:20:00Z",
       "approx_traffic_label": "200+",
       "approx_traffic_numeric": 200,
       "growth_percent": null,
       "description": "",
-      "discovered_at": "2026-11-23T15:56:18Z",
+      "discovered_at": "2026-11-24T15:51:37Z",
       "previously_seen_at": null,
       "recently_seen": false,
       "score": 0,
@@ -1394,20 +1369,68 @@
       }
     },
     {
-      "topic": "stadler rail",
-      "region": "KZ",
+      "topic": "ps plus extra games november 2026",
+      "region": "US",
       "regions": [
-        "KZ"
+        "US"
       ],
       "source": "Google Trends Trending Now RSS",
-      "source_url": "https://trends.google.com/trending/rss?geo=KZ",
-      "feed_url": "https://trends.google.com/trending/rss?geo=KZ",
-      "published_at": "2026-11-23T13:30:00Z",
+      "source_url": "https://trends.google.com/trending/rss?geo=US",
+      "feed_url": "https://trends.google.com/trending/rss?geo=US",
+      "published_at": "2026-11-24T15:00:00Z",
+      "approx_traffic_label": "200+",
+      "approx_traffic_numeric": 200,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:37Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 0,
+      "score_components": {
+        "volume": 0,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "rudy giuliani",
+      "region": "US",
+      "regions": [
+        "US"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=US",
+      "feed_url": "https://trends.google.com/trending/rss?geo=US",
+      "published_at": "2026-11-24T15:20:00Z",
+      "approx_traffic_label": "200+",
+      "approx_traffic_numeric": 200,
+      "growth_percent": null,
+      "description": "",
+      "discovered_at": "2026-11-24T15:51:37Z",
+      "previously_seen_at": null,
+      "recently_seen": false,
+      "score": 0,
+      "score_components": {
+        "volume": 0,
+        "growth": 0,
+        "freshness": 0
+      }
+    },
+    {
+      "topic": "seiya suzuki",
+      "region": "US",
+      "regions": [
+        "US"
+      ],
+      "source": "Google Trends Trending Now RSS",
+      "source_url": "https://trends.google.com/trending/rss?geo=US",
+      "feed_url": "https://trends.google.com/trending/rss?geo=US",
+      "published_at": "2026-11-24T15:10:00Z",
       "approx_traffic_label": "1000+",
       "approx_traffic_numeric": 1000,
       "growth_percent": null,
       "description": "",
-      "discovered_at": "2026-11-23T15:56:17Z",
+      "discovered_at": "2026-11-24T15:51:37Z",
       "previously_seen_at": null,
       "recently_seen": false,
       "score": 0,
